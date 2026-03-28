@@ -1,0 +1,219 @@
+<!-- ============================================
+     sections/sorting.html
+     Sorting Section — Standalone Preview
+============================================ -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sorting — DAA Salary Engine</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Unbounded:wght@700;900&family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#050810; --bg2:#080d1a; --surface:#0d1424; --border:#1a2540;
+      --accent1:#00f5c4; --accent2:#ff6b35; --accent3:#7c3fff; --accent4:#ffd23f;
+      --text:#e8eaf6; --text2:#7a8db5;
+      --glow1: 0 0 20px rgba(0,245,196,0.4);
+    }
+    *{ box-sizing:border-box; margin:0; padding:0; }
+    body{ background:var(--bg2); color:var(--text); font-family:'Space Mono',monospace; padding:60px 40px; }
+
+    .section-label { font-size:.6rem; letter-spacing:.3em; text-transform:uppercase; color:var(--accent1); margin-bottom:10px; }
+    .section-title { font-family:'Unbounded',sans-serif; font-weight:700; font-size:2.2rem; line-height:1.15; margin-bottom:16px; }
+    .section-desc  { color:var(--text2); font-size:.82rem; line-height:1.9; max-width:520px; margin-bottom:24px; }
+    .tag-teal{ color:var(--accent1); }
+
+    .complexity {
+      display:inline-flex; align-items:center; gap:8px;
+      font-family:'Inconsolata',monospace; font-size:.75rem; color:var(--accent4);
+      background:rgba(255,210,63,.08); border:1px solid rgba(255,210,63,.2);
+      padding:4px 12px; border-radius:4px; margin-bottom:30px;
+    }
+
+    .algorithm-info {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+      margin-bottom: 30px;
+    }
+    .algo-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 20px;
+    }
+    .algo-card h4 { font-size:.75rem; color:var(--accent1); margin-bottom:10px; letter-spacing:.05em; }
+    .algo-card p  { font-size:.68rem; color:var(--text2); line-height:1.8; }
+    .algo-card .tc{ font-family:'Inconsolata',monospace; color:var(--accent3); font-size:.8rem; margin-top:8px; display:block; }
+
+    .sort-arena { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:32px; }
+    .sort-controls { display:flex; gap:12px; margin-bottom:28px; flex-wrap:wrap; }
+
+    .btn { padding:9px 20px; border-radius:4px; font-family:'Space Mono',monospace; font-size:.7rem; letter-spacing:.08em; font-weight:700; cursor:pointer; border:none; transition:all .2s; text-transform:uppercase; }
+    .btn-primary   { background:var(--accent1); color:#000; }
+    .btn-primary:hover { box-shadow:var(--glow1); transform:translateY(-1px); }
+    .btn-secondary { background:transparent; color:var(--accent2); border:1px solid var(--accent2); }
+    .btn-secondary:hover { background:rgba(255,107,53,.1); }
+    .btn-tertiary  { background:transparent; color:var(--accent3); border:1px solid var(--accent3); }
+    .btn-tertiary:hover { background:rgba(124,63,255,.1); }
+    .btn-gold      { background:transparent; color:var(--accent4); border:1px solid var(--accent4); }
+    .btn-gold:hover { background:rgba(255,210,63,.1); }
+
+    .bar-container { display:flex; align-items:flex-end; gap:6px; height:180px; margin-bottom:20px; }
+    .bar {
+      flex:1; border-radius:4px 4px 0 0;
+      background:linear-gradient(180deg,var(--accent3) 0%,rgba(124,63,255,.4) 100%);
+      transition:height .3s ease,background .3s; position:relative; min-width:24px;
+    }
+    .bar.active { background:linear-gradient(180deg,var(--accent1) 0%,rgba(0,245,196,.3) 100%); }
+    .bar.sorted  { background:linear-gradient(180deg,var(--accent4) 0%,rgba(255,210,63,.3) 100%); }
+    .bar-label { position:absolute; bottom:-22px; left:50%; transform:translateX(-50%); font-size:.55rem; color:var(--text2); white-space:nowrap; }
+    .sort-info { font-size:.7rem; color:var(--text2); margin-top:28px; min-height:20px; }
+    .sort-info span { color:var(--accent1); }
+
+    /* Pseudocode box */
+    .pseudo-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-top:30px; }
+    .pseudo-box {
+      background: var(--bg); border:1px solid var(--border);
+      border-radius:8px; padding:18px;
+      font-family:'Inconsolata',monospace; font-size:.68rem; line-height:1.9;
+    }
+    .pseudo-box h5 { color:var(--accent4); margin-bottom:10px; font-size:.72rem; letter-spacing:.05em; }
+    .pseudo-box .kw  { color:var(--accent3); }
+    .pseudo-box .fn  { color:var(--accent1); }
+    .pseudo-box .cm  { color:var(--text2); font-style:italic; }
+    .pseudo-box .num { color:var(--accent2); }
+
+    @media(max-width:768px){ .algorithm-info,.pseudo-grid{ grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+
+  <div class="section-label">Algorithm 01 — Comparison-Based</div>
+  <h2 class="section-title">Employee Salary <span class="tag-teal">Ranking</span></h2>
+  <p class="section-desc">Sorting algorithms organize employee records by compensation. Visualize Bubble Sort, Selection Sort, and Quick Sort on a live payroll dataset in real-time.</p>
+  <div class="complexity">⏱ Best: O(n log n) &nbsp;|&nbsp; Worst: O(n²) &nbsp;|&nbsp; Space: O(1)~O(n)</div>
+
+  <!-- Algorithm Info Cards -->
+  <div class="algorithm-info">
+    <div class="algo-card">
+      <h4>Bubble Sort</h4>
+      <p>Repeatedly compares adjacent employees, swapping if out of order. Simple but slow for large payrolls.</p>
+      <span class="tc">O(n²) time | O(1) space</span>
+    </div>
+    <div class="algo-card">
+      <h4>Selection Sort</h4>
+      <p>Finds minimum salary in unsorted portion and places it at the beginning. Good for small HR datasets.</p>
+      <span class="tc">O(n²) time | O(1) space</span>
+    </div>
+    <div class="algo-card">
+      <h4>Quick Sort</h4>
+      <p>Picks a pivot salary, partitions around it, and recursively sorts. Industry standard for large payrolls.</p>
+      <span class="tc">O(n log n) avg | O(log n) space</span>
+    </div>
+  </div>
+
+  <!-- Live Visualizer -->
+  <div class="sort-arena">
+    <div class="sort-controls">
+      <button class="btn btn-primary"   onclick="sortAlgo('bubble')">▶ Bubble Sort</button>
+      <button class="btn btn-secondary" onclick="sortAlgo('selection')">▶ Selection Sort</button>
+      <button class="btn btn-tertiary"  onclick="sortAlgo('quick')">▶ Quick Sort</button>
+      <button class="btn btn-gold"      onclick="resetSort()">↺ Shuffle</button>
+    </div>
+    <div class="bar-container" id="bars"></div>
+    <div class="sort-info" id="sort-info">Click an algorithm to visualize salary ranking in real-time.</div>
+  </div>
+
+  <!-- Pseudocode -->
+  <div class="pseudo-grid">
+    <div class="pseudo-box">
+      <h5>Bubble Sort Pseudocode</h5>
+      <span class="kw">for</span> i = <span class="num">0</span> to n-1:<br>
+      &nbsp;&nbsp;<span class="kw">for</span> j = <span class="num">0</span> to n-i-1:<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> sal[j] &gt; sal[j+1]:<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">swap</span>(sal[j], sal[j+1])<br>
+      <span class="cm">// O(n²) comparisons</span>
+    </div>
+    <div class="pseudo-box">
+      <h5>Selection Sort Pseudocode</h5>
+      <span class="kw">for</span> i = <span class="num">0</span> to n-1:<br>
+      &nbsp;&nbsp;minIdx = i<br>
+      &nbsp;&nbsp;<span class="kw">for</span> j = i+1 to n:<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> sal[j] &lt; sal[minIdx]:<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;minIdx = j<br>
+      &nbsp;&nbsp;<span class="fn">swap</span>(sal[i], sal[minIdx])
+    </div>
+    <div class="pseudo-box">
+      <h5>Quick Sort Pseudocode</h5>
+      <span class="fn">quickSort</span>(arr, lo, hi):<br>
+      &nbsp;&nbsp;<span class="kw">if</span> lo &lt; hi:<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;pi = <span class="fn">partition</span>(arr,lo,hi)<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">quickSort</span>(arr,lo,pi-1)<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">quickSort</span>(arr,pi+1,hi)<br>
+      <span class="cm">// Divide & Conquer</span>
+    </div>
+  </div>
+
+  <script>
+    const employees = [
+      {name:'Aryan',sal:45},{name:'Priya',sal:82},{name:'Raj',sal:31},
+      {name:'Sneha',sal:67},{name:'Vikram',sal:95},{name:'Aisha',sal:53},
+      {name:'Dev',sal:28},{name:'Riya',sal:74},{name:'Suresh',sal:41},{name:'Nisha',sal:88}
+    ];
+    let sortData=[],sortTimeout=null,sorting=false;
+
+    function renderBars(data,active=[],sorted=[]){
+      const cont=document.getElementById('bars');
+      const max=Math.max(...data.map(d=>d.sal));
+      cont.innerHTML=data.map((d,i)=>{
+        let cls='bar';
+        if(active.includes(i))cls+=' active';
+        else if(sorted.includes(i))cls+=' sorted';
+        const h=Math.round((d.sal/max)*160);
+        return `<div class="${cls}" style="height:${h}px"><span class="bar-label">${d.name}<br><span style="color:var(--accent4)">${d.sal}K</span></span></div>`;
+      }).join('');
+    }
+
+    function resetSort(){
+      clearTimeout(sortTimeout);sorting=false;
+      sortData=employees.map(e=>({...e}));
+      for(let i=sortData.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[sortData[i],sortData[j]]=[sortData[j],sortData[i]];}
+      renderBars(sortData,[],[]);
+      document.getElementById('sort-info').innerHTML='Shuffled! Click an algorithm.';
+    }
+
+    function sleep(ms){return new Promise(r=>{sortTimeout=setTimeout(r,ms);});}
+
+    async function bubbleSort(arr){
+      const n=arr.length;let sorted=[];
+      for(let i=0;i<n-1;i++){for(let j=0;j<n-i-1;j++){if(!sorting)return;renderBars(arr,[j,j+1],sorted);document.getElementById('sort-info').innerHTML=`Comparing <span>${arr[j].name} (${arr[j].sal}K)</span> vs <span>${arr[j+1].name} (${arr[j+1].sal}K)</span>`;await sleep(350);if(arr[j].sal>arr[j+1].sal){[arr[j],arr[j+1]]=[arr[j+1],arr[j]];renderBars(arr,[j,j+1],sorted);await sleep(180);}}sorted.push(n-1-i);}
+      sorted=arr.map((_,i)=>i);renderBars(arr,[],sorted);document.getElementById('sort-info').innerHTML=`✓ Sorted! <span>${arr.map(e=>e.name).join(' → ')}</span>`;
+    }
+
+    async function selectionSort(arr){
+      const n=arr.length;let sorted=[];
+      for(let i=0;i<n-1;i++){if(!sorting)return;let minIdx=i;for(let j=i+1;j<n;j++){renderBars(arr,[j,minIdx],sorted);document.getElementById('sort-info').innerHTML=`Min: <span>${arr[minIdx].name} (${arr[minIdx].sal}K)</span>`;await sleep(250);if(arr[j].sal<arr[minIdx].sal)minIdx=j;}if(minIdx!==i){[arr[i],arr[minIdx]]=[arr[minIdx],arr[i]];renderBars(arr,[i],sorted);await sleep(200);}sorted.push(i);}
+      sorted=arr.map((_,i)=>i);renderBars(arr,[],sorted);document.getElementById('sort-info').innerHTML=`✓ Selection Sort done! <span>${arr.map(e=>e.name).join(' → ')}</span>`;
+    }
+
+    async function quickSort(arr,lo=0,hi=arr.length-1,sorted=[]){
+      if(lo>=hi||!sorting)return;
+      let pivot=arr[hi],i=lo-1;
+      document.getElementById('sort-info').innerHTML=`Pivot: <span>${pivot.name} (${pivot.sal}K)</span> — partitioning [${lo}..${hi}]`;
+      for(let j=lo;j<hi;j++){if(!sorting)return;renderBars(arr,[j,hi],sorted);await sleep(300);if(arr[j].sal<=pivot.sal){i++;[arr[i],arr[j]]=[arr[j],arr[i]];}}
+      [arr[i+1],arr[hi]]=[arr[hi],arr[i+1]];const pi=i+1;sorted.push(pi);renderBars(arr,[pi],sorted);await sleep(250);
+      await quickSort(arr,lo,pi-1,sorted);await quickSort(arr,pi+1,hi,sorted);
+    }
+
+    async function sortAlgo(type){
+      if(sorting)return;sorting=true;
+      if(sortData.length===0)resetSort();
+      const arr=[...sortData];
+      if(type==='bubble')await bubbleSort(arr);
+      else if(type==='selection')await selectionSort(arr);
+      else{await quickSort(arr);renderBars(arr,[],arr.map((_,i)=>i));document.getElementById('sort-info').innerHTML=`✓ Quick Sort complete! <span>${arr.map(e=>e.name).join(' → ')}</span>`;}
+      sorting=false;sortData=arr;
+    }
+
+    resetSort();
+  </script>
+</body>
+</html>

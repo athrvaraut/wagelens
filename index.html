@@ -1,0 +1,1815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WageLens — See Your Salary Clearly</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,500&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   TOKENS & RESET
+═══════════════════════════════════════ */
+:root {
+  --parchment:  #F5F0E8;
+  --cream:      #FDFBF7;
+  --white:      #FFFFFF;
+  --forest:     #1B4332;
+  --green:      #2D6A4F;
+  --mint:       #52B788;
+  --sage:       #B7E4C7;
+  --coral:      #E76F51;
+  --gold:       #E9A825;
+  --sand:       #F4A261;
+  --ink:        #1C1917;
+  --stone:      #44403C;
+  --muted:      #78716C;
+  --border:     #E7E2D9;
+  --shadow:     rgba(28,25,23,.08);
+  --shadow-md:  rgba(28,25,23,.13);
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-xl: 32px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--parchment);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════
+   PAGE SYSTEM (SPA)
+═══════════════════════════════════════ */
+.page {
+  display: none;
+  min-height: 100vh;
+  animation: pageIn .45s cubic-bezier(.22,.68,0,1.2) both;
+}
+.page.active { display: block; }
+@keyframes pageIn {
+  from { opacity:0; transform:translateY(22px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ═══════════════════════════════════════
+   NAV
+═══════════════════════════════════════ */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 200;
+  padding: 0 48px;
+  height: 68px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(253,251,247,.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.35rem; font-weight: 700;
+  color: var(--forest);
+  text-decoration: none;
+  cursor: pointer;
+}
+.nav-logo .dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--coral);
+}
+.nav-tagline {
+  font-size: .72rem; color: var(--muted); letter-spacing: .06em;
+  font-style: italic;
+}
+.nav-actions { display: flex; gap: 12px; align-items: center; }
+.nav-pill {
+  font-size: .72rem; font-weight: 600; letter-spacing: .04em;
+  padding: 7px 18px; border-radius: 20px; cursor: pointer;
+  transition: all .22s; text-decoration: none; border: none;
+}
+.nav-pill.outline {
+  background: transparent; color: var(--green);
+  border: 1.5px solid var(--mint);
+}
+.nav-pill.outline:hover { background: var(--sage); }
+.nav-pill.solid {
+  background: var(--forest); color: white;
+}
+.nav-pill.solid:hover { background: var(--green); transform: translateY(-1px); box-shadow: 0 4px 14px var(--shadow-md); }
+
+/* ═══════════════════════════════════════
+   PAGE 1 — HOME
+═══════════════════════════════════════ */
+#page-home {
+  padding-top: 68px;
+  background: var(--cream);
+}
+
+.home-hero {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 0; min-height: calc(100vh - 68px);
+}
+.hero-left {
+  padding: 80px 64px 64px 72px;
+  display: flex; flex-direction: column; justify-content: center;
+  position: relative;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: .72rem; font-weight: 600; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--coral);
+  margin-bottom: 24px;
+}
+.hero-eyebrow::before {
+  content: ''; width: 28px; height: 2px; background: var(--coral);
+}
+.hero-h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.6rem, 4.5vw, 4rem);
+  font-weight: 900; line-height: 1.1;
+  color: var(--forest);
+  margin-bottom: 20px;
+}
+.hero-h1 em { font-style: italic; color: var(--coral); }
+.hero-sub {
+  font-size: 1.05rem; color: var(--stone); line-height: 1.75;
+  max-width: 440px; margin-bottom: 44px;
+}
+.hero-cta-row { display: flex; align-items: center; gap: 20px; }
+.btn-hero {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 15px 34px; border-radius: 50px;
+  background: var(--forest); color: white;
+  font-size: .92rem; font-weight: 600;
+  cursor: pointer; border: none;
+  transition: all .25s;
+  box-shadow: 0 4px 20px rgba(27,67,50,.3);
+}
+.btn-hero:hover { background: var(--green); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(27,67,50,.35); }
+.btn-hero .arrow { font-size: 1.1rem; transition: transform .2s; }
+.btn-hero:hover .arrow { transform: translateX(4px); }
+.hero-trust { font-size: .72rem; color: var(--muted); }
+.hero-trust strong { color: var(--green); }
+
+.hero-stats {
+  display: flex; gap: 32px; margin-top: 56px;
+  padding-top: 40px; border-top: 1px solid var(--border);
+}
+.stat-item .s-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem; font-weight: 700; color: var(--forest);
+  line-height: 1;
+}
+.stat-item .s-label { font-size: .72rem; color: var(--muted); margin-top: 4px; }
+
+.hero-right {
+  background: var(--forest);
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  padding: 60px 50px;
+}
+.hero-right::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 70% 30%, rgba(82,183,136,.25), transparent),
+    radial-gradient(ellipse 50% 60% at 20% 80%, rgba(231,111,81,.15), transparent);
+}
+.hero-card-preview {
+  position: relative; z-index: 1;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: var(--r-xl);
+  padding: 36px;
+  width: 100%; max-width: 380px;
+  backdrop-filter: blur(8px);
+}
+.hcp-label { font-size: .68rem; letter-spacing: .1em; color: rgba(255,255,255,.5); text-transform: uppercase; margin-bottom: 6px; }
+.hcp-name { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: white; margin-bottom: 28px; }
+.hcp-salary-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; }
+.hcp-salary-main .amount {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 2.4rem; font-weight: 600; color: white; line-height: 1;
+}
+.hcp-salary-main .per { font-size: .75rem; color: rgba(255,255,255,.5); }
+.hcp-badge {
+  background: rgba(82,183,136,.25); color: #74C69D;
+  padding: 4px 12px; border-radius: 20px;
+  font-size: .72rem; font-weight: 600;
+  border: 1px solid rgba(82,183,136,.3);
+}
+.hcp-bars { display: flex; flex-direction: column; gap: 10px; }
+.hcp-bar-row { display: flex; align-items: center; gap: 10px; }
+.hcp-bar-label { font-size: .68rem; color: rgba(255,255,255,.5); width: 70px; flex-shrink: 0; }
+.hcp-bar-track { flex: 1; height: 6px; background: rgba(255,255,255,.1); border-radius: 3px; overflow: hidden; }
+.hcp-bar-fill { height: 100%; border-radius: 3px; }
+.hcp-bar-val { font-family: 'JetBrains Mono', monospace; font-size: .68rem; color: rgba(255,255,255,.7); width: 52px; text-align: right; }
+
+/* Floating chips on hero right */
+.float-chip {
+  position: absolute; z-index: 2;
+  background: white; border-radius: 12px;
+  padding: 10px 16px; box-shadow: 0 8px 30px rgba(0,0,0,.2);
+  font-size: .72rem; font-weight: 600; color: var(--ink);
+  display: flex; align-items: center; gap: 8px;
+  animation: floatY 4s ease-in-out infinite;
+}
+.float-chip:nth-child(2) { animation-delay: -1.5s; }
+.float-chip:nth-child(3) { animation-delay: -3s; }
+@keyframes floatY { 0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)} }
+.chip-icon { font-size: 1rem; }
+
+/* Problem statement section */
+.problem-section {
+  padding: 100px 72px;
+  background: var(--parchment);
+}
+.ps-eyebrow { font-size: .7rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--coral); margin-bottom: 14px; }
+.ps-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  font-weight: 700; color: var(--forest); margin-bottom: 20px; line-height: 1.2;
+}
+.ps-body { font-size: 1rem; color: var(--stone); max-width: 600px; line-height: 1.8; margin-bottom: 48px; }
+
+.problem-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.problem-card {
+  background: white; border-radius: var(--r-lg);
+  padding: 28px; border: 1px solid var(--border);
+  transition: transform .25s, box-shadow .25s;
+}
+.problem-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px var(--shadow); }
+.pc-icon { font-size: 2rem; margin-bottom: 14px; }
+.pc-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--forest); margin-bottom: 8px; }
+.pc-body { font-size: .82rem; color: var(--muted); line-height: 1.7; }
+
+/* How it works */
+.how-section { padding: 80px 72px; background: var(--forest); }
+.how-title { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 700; color: white; margin-bottom: 8px; }
+.how-sub { color: rgba(255,255,255,.6); font-size: .9rem; margin-bottom: 48px; }
+.how-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
+.how-step { padding: 28px 24px; position: relative; }
+.how-step:not(:last-child)::after {
+  content: '→'; position: absolute; right: -8px; top: 36px;
+  color: rgba(255,255,255,.3); font-size: 1.2rem;
+}
+.hs-num {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace; font-size: .82rem; color: var(--mint);
+  margin-bottom: 14px;
+}
+.hs-title { font-weight: 600; color: white; margin-bottom: 6px; font-size: .9rem; }
+.hs-desc { font-size: .75rem; color: rgba(255,255,255,.55); line-height: 1.6; }
+
+/* ═══════════════════════════════════════
+   PAGE 2 — INPUT FORM
+═══════════════════════════════════════ */
+#page-input { padding-top: 68px; background: var(--cream); }
+
+.form-layout {
+  display: grid; grid-template-columns: 1fr 1.1fr;
+  min-height: calc(100vh - 68px);
+}
+.form-sidebar {
+  background: var(--parchment);
+  padding: 60px 52px;
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; justify-content: center;
+}
+.fs-label { font-size: .68rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--coral); margin-bottom: 10px; }
+.fs-title { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--forest); line-height: 1.2; margin-bottom: 16px; }
+.fs-sub { font-size: .88rem; color: var(--muted); line-height: 1.7; margin-bottom: 40px; }
+
+.algo-list { display: flex; flex-direction: column; gap: 12px; }
+.algo-item {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 16px; border-radius: var(--r-md);
+  background: white; border: 1px solid var(--border);
+  transition: border-color .2s;
+}
+.algo-item:hover { border-color: var(--mint); }
+.ai-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+.ai-text .ai-name { font-size: .8rem; font-weight: 600; color: var(--forest); }
+.ai-text .ai-desc { font-size: .7rem; color: var(--muted); margin-top: 2px; line-height: 1.5; }
+
+.form-main { padding: 60px 52px; overflow-y: auto; }
+
+.form-section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem; font-weight: 700; color: var(--forest);
+  margin-bottom: 6px;
+}
+.form-section-sub { font-size: .82rem; color: var(--muted); margin-bottom: 32px; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 28px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1 / -1; }
+.form-label {
+  font-size: .72rem; font-weight: 600; letter-spacing: .04em;
+  color: var(--stone); text-transform: uppercase;
+}
+.form-input, .form-select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .92rem; color: var(--ink);
+  outline: none; transition: border-color .2s, box-shadow .2s;
+  appearance: none;
+}
+.form-input:focus, .form-select:focus {
+  border-color: var(--mint);
+  box-shadow: 0 0 0 3px rgba(82,183,136,.15);
+  background: white;
+}
+.form-input::placeholder { color: #B8B4AE; }
+.form-input.money { font-family: 'JetBrains Mono', monospace; font-size: 1rem; }
+
+.form-divider { height: 1px; background: var(--border); margin: 28px 0; }
+
+.range-wrapper { position: relative; }
+.range-input {
+  width: 100%; height: 6px;
+  -webkit-appearance: none; appearance: none;
+  background: linear-gradient(to right, var(--mint) 0%, var(--mint) 50%, var(--border) 50%);
+  border-radius: 3px; outline: none; cursor: pointer;
+}
+.range-input::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 20px; height: 20px;
+  border-radius: 50%; background: var(--forest);
+  border: 2px solid white; box-shadow: 0 2px 8px var(--shadow-md);
+  cursor: grab;
+}
+.range-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .85rem; font-weight: 600; color: var(--forest);
+  text-align: right; margin-top: 6px;
+}
+
+.btn-calculate {
+  width: 100%; padding: 16px;
+  background: var(--forest); color: white;
+  border: none; border-radius: var(--r-md);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem; font-weight: 600;
+  cursor: pointer; transition: all .25s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  box-shadow: 0 4px 20px rgba(27,67,50,.25);
+  margin-top: 12px;
+}
+.btn-calculate:hover { background: var(--green); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(27,67,50,.3); }
+
+/* ═══════════════════════════════════════
+   PAGE 3 — DASHBOARD
+═══════════════════════════════════════ */
+#page-dashboard { padding-top: 68px; background: var(--parchment); }
+
+.dashboard-hero {
+  background: var(--forest);
+  padding: 48px 72px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: relative; overflow: hidden;
+}
+.dashboard-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 55% 80% at 80% 50%, rgba(82,183,136,.2), transparent);
+}
+.dh-left { position: relative; z-index: 1; }
+.dh-greeting { font-size: .78rem; color: rgba(255,255,255,.55); letter-spacing: .06em; margin-bottom: 6px; }
+.dh-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem; font-weight: 700; color: white; margin-bottom: 6px;
+}
+.dh-role { font-size: .88rem; color: rgba(255,255,255,.6); }
+.dh-right { position: relative; z-index: 1; text-align: right; }
+.dh-takehome-label { font-size: .72rem; color: rgba(255,255,255,.5); letter-spacing: .06em; margin-bottom: 4px; }
+.dh-takehome-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 3rem; font-weight: 600; color: white; line-height: 1;
+}
+.dh-takehome-sub { font-size: .78rem; color: rgba(255,255,255,.45); margin-top: 4px; }
+
+/* Salary Breakdown Strip */
+.salary-strip {
+  display: flex; gap: 0;
+  background: white; border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+.strip-item {
+  flex: 1; min-width: 160px;
+  padding: 22px 28px;
+  border-right: 1px solid var(--border);
+  position: relative;
+  cursor: pointer; transition: background .2s;
+}
+.strip-item:last-child { border-right: none; }
+.strip-item:hover { background: var(--parchment); }
+.strip-item.active-strip { background: var(--sage); }
+.strip-item.active-strip::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 3px; background: var(--forest);
+}
+.si-label { font-size: .65rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.si-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.2rem; font-weight: 600; color: var(--ink);
+}
+.si-val.earning { color: var(--green); }
+.si-val.deduction { color: var(--coral); }
+.si-sub { font-size: .68rem; color: var(--muted); margin-top: 3px; }
+
+/* Dashboard Grid */
+.dashboard-body { padding: 40px 72px; }
+.db-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; margin-bottom: 24px; }
+.db-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+
+/* Cards */
+.card {
+  background: white; border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  overflow: hidden; transition: box-shadow .25s;
+}
+.card:hover { box-shadow: 0 8px 32px var(--shadow); }
+.card-header {
+  padding: 22px 26px 0;
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.card-title { font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.card-badge {
+  font-size: .62rem; font-weight: 600; padding: 3px 10px;
+  border-radius: 20px; letter-spacing: .04em;
+}
+.badge-green { background: rgba(82,183,136,.15); color: var(--green); }
+.badge-coral { background: rgba(231,111,81,.12); color: var(--coral); }
+.badge-gold  { background: rgba(233,168,37,.15); color: #B87D0E; }
+.card-body { padding: 18px 26px 26px; }
+
+/* Tax Card */
+.tax-visual { margin: 14px 0; }
+.tax-bar-track {
+  height: 12px; border-radius: 6px;
+  background: var(--parchment); overflow: hidden;
+  display: flex; margin-bottom: 14px;
+}
+.tax-bar-seg { height: 100%; transition: width .8s ease; }
+.tax-legend { display: flex; flex-wrap: wrap; gap: 12px; }
+.tl-item { display: flex; align-items: center; gap: 6px; font-size: .7rem; color: var(--stone); }
+.tl-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+/* Percentile Card */
+.percentile-big {
+  font-family: 'Playfair Display', serif;
+  font-size: 3.8rem; font-weight: 700; color: var(--forest);
+  line-height: 1; margin: 14px 0 6px;
+}
+.percentile-desc { font-size: .8rem; color: var(--muted); line-height: 1.6; }
+.peer-bar-track {
+  height: 8px; border-radius: 4px;
+  background: var(--parchment); overflow: hidden;
+  margin: 16px 0 6px; position: relative;
+}
+.peer-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--mint), var(--forest)); transition: width .9s ease; }
+.peer-marker {
+  position: absolute; top: -5px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--coral); border: 2px solid white;
+  box-shadow: 0 2px 8px var(--shadow-md);
+  transform: translateX(-50%);
+  transition: left .9s ease;
+}
+.peer-range { display: flex; justify-content: space-between; font-size: .68rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+/* Take-home donut card */
+.donut-wrap { position: relative; width: 140px; height: 140px; margin: 16px auto; }
+.donut-svg { width: 140px; height: 140px; transform: rotate(-90deg); }
+.donut-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+}
+.donut-pct { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: var(--forest); line-height: 1; }
+.donut-sub { font-size: .62rem; color: var(--muted); margin-top: 2px; }
+
+/* Breakdown list */
+.breakdown-list { display: flex; flex-direction: column; gap: 0; }
+.bl-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 0; border-bottom: 1px solid var(--border);
+  font-size: .82rem;
+}
+.bl-item:last-child { border-bottom: none; }
+.bl-key { color: var(--stone); display: flex; align-items: center; gap: 8px; }
+.bl-dot { width: 8px; height: 8px; border-radius: 2px; }
+.bl-val { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: .85rem; }
+.bl-val.pos { color: var(--green); }
+.bl-val.neg { color: var(--coral); }
+.bl-val.bold { color: var(--forest); font-size: .95rem; }
+
+/* Action buttons row */
+.action-row {
+  display: flex; gap: 14px; margin-top: 32px; flex-wrap: wrap;
+}
+.btn-action {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 24px; border-radius: var(--r-sm);
+  font-size: .82rem; font-weight: 600; cursor: pointer;
+  border: none; transition: all .22s;
+}
+.btn-action.primary { background: var(--forest); color: white; }
+.btn-action.primary:hover { background: var(--green); box-shadow: 0 4px 16px var(--shadow-md); }
+.btn-action.secondary { background: var(--parchment); color: var(--stone); border: 1.5px solid var(--border); }
+.btn-action.secondary:hover { border-color: var(--mint); background: var(--sage); }
+
+/* ═══════════════════════════════════════
+   PAGE 4 — TAX OPTIMIZER
+═══════════════════════════════════════ */
+#page-tax { padding-top: 68px; background: var(--cream); }
+
+.page-inner { max-width: 1100px; margin: 0 auto; padding: 56px 40px; }
+.page-back {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .78rem; font-weight: 600; color: var(--muted);
+  cursor: pointer; margin-bottom: 36px; border: none; background: none;
+  transition: color .2s;
+}
+.page-back:hover { color: var(--forest); }
+
+.tax-hero-strip {
+  background: linear-gradient(135deg, var(--forest), var(--green));
+  border-radius: var(--r-xl); padding: 44px 52px;
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 0; margin-bottom: 32px; position: relative; overflow: hidden;
+}
+.tax-hero-strip::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 80% 50%, rgba(255,255,255,.08), transparent 60%);
+}
+.ths-item { padding: 0 32px; border-right: 1px solid rgba(255,255,255,.15); position: relative; z-index: 1; }
+.ths-item:first-child { padding-left: 0; }
+.ths-item:last-child { border-right: none; }
+.ths-label { font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.55); margin-bottom: 6px; }
+.ths-val { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: white; }
+.ths-sub { font-size: .72rem; color: rgba(255,255,255,.5); margin-top: 4px; }
+
+.slab-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 28px; }
+.slab-table th {
+  padding: 12px 20px; text-align: left;
+  font-size: .68rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); background: var(--parchment);
+  border-bottom: 2px solid var(--border);
+}
+.slab-table td {
+  padding: 14px 20px; font-size: .85rem;
+  border-bottom: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  background: white;
+}
+.slab-table tr:last-child td { border-bottom: none; }
+.slab-table tr.active-slab td { background: rgba(82,183,136,.06); }
+.slab-table tr.active-slab td:first-child {
+  border-left: 3px solid var(--mint);
+}
+.st-range { font-family: 'DM Sans', sans-serif; font-size: .82rem; color: var(--stone); }
+.st-rate { color: var(--coral); font-weight: 600; }
+.st-filled { color: var(--green); }
+.st-tax { color: var(--ink); font-weight: 600; }
+.st-nil { color: var(--muted); }
+
+.tax-tips { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 28px; }
+.tax-tip {
+  background: white; border: 1px solid var(--border); border-radius: var(--r-md);
+  padding: 20px; display: flex; gap: 14px; align-items: flex-start;
+  transition: border-color .2s;
+}
+.tax-tip:hover { border-color: var(--mint); }
+.tip-icon { font-size: 1.4rem; flex-shrink: 0; }
+.tip-title { font-size: .82rem; font-weight: 600; color: var(--forest); margin-bottom: 4px; }
+.tip-body { font-size: .75rem; color: var(--muted); line-height: 1.6; }
+
+/* ═══════════════════════════════════════
+   PAGE 5 — GROWTH PROJECTION
+═══════════════════════════════════════ */
+#page-growth { padding-top: 68px; background: var(--parchment); }
+
+.growth-header {
+  background: var(--cream); border-bottom: 1px solid var(--border);
+  padding: 40px 72px;
+}
+.growth-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem; font-weight: 700; color: var(--forest); margin-bottom: 6px;
+}
+.growth-header p { font-size: .88rem; color: var(--muted); max-width: 500px; }
+
+.growth-body { padding: 40px 72px; }
+.growth-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+
+/* Chart */
+.chart-card { background: white; border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
+.chart-card-header {
+  padding: 20px 26px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.chart-card-header h3 { font-size: .9rem; font-weight: 600; color: var(--forest); }
+.chart-legend { display: flex; gap: 16px; }
+.cl-item { display: flex; align-items: center; gap: 6px; font-size: .7rem; color: var(--muted); }
+.cl-line { width: 18px; height: 2px; border-radius: 1px; }
+.chart-area { padding: 24px; height: 280px; position: relative; width: 100%; overflow: hidden; }
+#growthChart { display: block; width: 100% !important; height: 232px !important; }
+
+/* Year cards */
+.year-cards { display: flex; flex-direction: column; gap: 12px; }
+.year-card {
+  background: white; border: 1.5px solid var(--border);
+  border-radius: var(--r-md); padding: 18px 20px;
+  cursor: pointer; transition: all .2s;
+}
+.year-card:hover { border-color: var(--mint); transform: translateX(4px); }
+.year-card.current { border-color: var(--forest); background: rgba(27,67,50,.04); }
+.yc-year { font-size: .65rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.yc-salary { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 600; color: var(--forest); }
+.yc-growth { font-size: .72rem; color: var(--mint); margin-top: 2px; }
+.yc-action { font-size: .7rem; color: var(--muted); margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); line-height: 1.5; }
+
+/* Career path */
+.career-path-card { background: white; border: 1px solid var(--border); border-radius: var(--r-lg); padding: 26px; margin-top: 24px; }
+.cp-title { font-size: .82rem; font-weight: 600; color: var(--forest); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+.career-path { display: flex; align-items: center; gap: 0; overflow-x: auto; padding-bottom: 4px; }
+.cp-stage {
+  display: flex; flex-direction: column; align-items: center;
+  min-width: 110px; padding: 0 8px;
+}
+.cp-circle {
+  width: 44px; height: 44px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; margin-bottom: 8px;
+  border: 2px solid var(--border);
+  background: var(--parchment);
+  transition: all .2s;
+}
+.cp-circle.active { background: var(--forest); border-color: var(--forest); box-shadow: 0 4px 14px rgba(27,67,50,.3); }
+.cp-circle.reached { background: var(--sage); border-color: var(--mint); }
+.cp-stage-name { font-size: .7rem; font-weight: 600; color: var(--stone); text-align: center; }
+.cp-stage-sal { font-family: 'JetBrains Mono', monospace; font-size: .65rem; color: var(--muted); text-align: center; margin-top: 2px; }
+.cp-arrow { color: var(--border); font-size: 1rem; flex-shrink: 0; }
+
+/* ═══════════════════════════════════════
+   SHARED COMPONENTS
+═══════════════════════════════════════ */
+.section-eyebrow {
+  font-size: .68rem; font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--coral); margin-bottom: 8px;
+}
+.section-h { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: var(--forest); margin-bottom: 8px; }
+
+/* Footer nav (page-switcher dots) */
+.page-nav {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  z-index: 100;
+  display: flex; gap: 6px; align-items: center;
+  background: white; padding: 8px 14px; border-radius: 30px;
+  box-shadow: 0 4px 24px var(--shadow-md);
+  border: 1px solid var(--border);
+}
+.pn-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--border); cursor: pointer; transition: all .2s;
+}
+.pn-dot.active { background: var(--forest); width: 24px; border-radius: 4px; }
+.pn-label { font-size: .68rem; color: var(--muted); padding: 0 4px; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--forest); color: white;
+  padding: 12px 24px; border-radius: 30px;
+  font-size: .8rem; font-weight: 600;
+  box-shadow: 0 4px 20px var(--shadow-md);
+  opacity: 0; transition: all .3s; z-index: 999;
+  pointer-events: none; white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .home-hero { grid-template-columns: 1fr; }
+  .hero-right { display: none; }
+  .problem-cards { grid-template-columns: 1fr 1fr; }
+  .how-steps { grid-template-columns: 1fr 1fr; }
+  .form-layout { grid-template-columns: 1fr; }
+  .form-sidebar { display: none; }
+  .db-grid { grid-template-columns: 1fr; }
+  .growth-grid { grid-template-columns: 1fr; }
+  .dashboard-hero { flex-direction: column; gap: 24px; text-align: center; }
+  .dh-right { text-align: center; }
+  .dashboard-body, .growth-body, .problem-section, .how-section { padding-left: 24px; padding-right: 24px; }
+  .hero-left { padding: 60px 32px; }
+  .tax-hero-strip { grid-template-columns: 1fr; gap: 24px; }
+  .ths-item { padding-left: 0; border-right: none; border-bottom: 1px solid rgba(255,255,255,.15); padding-bottom: 20px; }
+  .ths-item:last-child { border-bottom: none; padding-bottom: 0; }
+}
+@media (max-width: 640px) {
+  .nav { padding: 0 20px; }
+  .nav-tagline, .nav-pill.outline { display: none; }
+  .problem-cards, .db-grid-3, .tax-tips { grid-template-columns: 1fr; }
+  .how-steps { grid-template-columns: 1fr; }
+  .how-step::after { display: none; }
+  .form-grid { grid-template-columns: 1fr; }
+  .salary-strip { flex-direction: column; }
+  .strip-item { border-right: none; border-bottom: 1px solid var(--border); }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="main-nav">
+  <div class="nav-logo" onclick="goTo('home')">
+    <div class="dot"></div>
+    WageLens
+  </div>
+  <span class="nav-tagline">See your salary clearly</span>
+  <div class="nav-actions">
+    <button class="nav-pill outline" onclick="goTo('input')" id="nav-recalc" style="display:none">Recalculate</button>
+    <button class="nav-pill solid" onclick="goTo('input')" id="nav-start">Get Started</button>
+  </div>
+</nav>
+
+<!-- PAGE NAV DOTS -->
+<div class="page-nav" id="page-nav" style="display:none">
+  <div class="pn-dot active" onclick="goTo('dashboard')" data-page="dashboard" title="Dashboard"></div>
+  <div class="pn-dot" onclick="goTo('tax')" data-page="tax" title="Tax Optimizer"></div>
+  <div class="pn-dot" onclick="goTo('growth')" data-page="growth" title="Career Growth"></div>
+  <span class="pn-label" id="pn-label">Dashboard</span>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ════════════════════════════════════
+     PAGE 1 — HOME
+════════════════════════════════════ -->
+<div class="page active" id="page-home">
+
+  <div class="home-hero">
+    <div class="hero-left">
+      <div class="hero-eyebrow">Salary Intelligence Platform</div>
+      <h1 class="hero-h1">
+        Your Salary,<br>
+        <em>Decoded</em> &amp;<br>
+        Optimised
+      </h1>
+      <p class="hero-sub">
+        Enter your CTC once. WageLens instantly calculates your exact take-home pay, optimises your tax using smart algorithms, benchmarks you against industry peers, and projects your career salary for the next 5 years.
+      </p>
+      <div class="hero-cta-row">
+        <button class="btn-hero" onclick="goTo('input')">
+          Calculate My Salary <span class="arrow">→</span>
+        </button>
+        <span class="hero-trust">Takes <strong>60 seconds</strong> · No signup needed</span>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="s-val">6</div>
+          <div class="s-label">Smart Algorithms</div>
+        </div>
+        <div class="stat-item">
+          <div class="s-val">₹0</div>
+          <div class="s-label">Cost, Forever</div>
+        </div>
+        <div class="stat-item">
+          <div class="s-val">100%</div>
+          <div class="s-label">Private & Local</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <!-- Floating chips -->
+      <div class="float-chip" style="top:14%;left:8%">
+        <span class="chip-icon">📈</span>
+        <span>+18% next year</span>
+      </div>
+      <div class="float-chip" style="bottom:18%;right:6%">
+        <span class="chip-icon">💰</span>
+        <span>₹12,400 tax saved</span>
+      </div>
+      <div class="float-chip" style="top:60%;left:4%">
+        <span class="chip-icon">🏆</span>
+        <span>Top 23% in India</span>
+      </div>
+
+      <!-- Card preview -->
+      <div class="hero-card-preview">
+        <div class="hcp-label">Take-Home Salary</div>
+        <div class="hcp-name">Ananya Sharma</div>
+        <div class="hcp-salary-row">
+          <div class="hcp-salary-main">
+            <div class="amount">₹68,240</div>
+            <div class="per">per month</div>
+          </div>
+          <div class="hcp-badge">+12.4%</div>
+        </div>
+        <div class="hcp-bars">
+          <div class="hcp-bar-row">
+            <span class="hcp-bar-label">Basic</span>
+            <div class="hcp-bar-track"><div class="hcp-bar-fill" style="width:55%;background:#74C69D"></div></div>
+            <span class="hcp-bar-val">₹55K</span>
+          </div>
+          <div class="hcp-bar-row">
+            <span class="hcp-bar-label">HRA</span>
+            <div class="hcp-bar-track"><div class="hcp-bar-fill" style="width:22%;background:#95D5B2"></div></div>
+            <span class="hcp-bar-val">₹22K</span>
+          </div>
+          <div class="hcp-bar-row">
+            <span class="hcp-bar-label">Tax</span>
+            <div class="hcp-bar-track"><div class="hcp-bar-fill" style="width:9%;background:#E76F51"></div></div>
+            <span class="hcp-bar-val">₹8.2K</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Problem Section -->
+  <div class="problem-section">
+    <div class="ps-eyebrow">The Real Problem We Solve</div>
+    <h2 class="ps-title">Most employees never truly<br>understand their own salary</h2>
+    <p class="ps-body">
+      You receive an offer letter with a CTC number. But what does that actually mean for your wallet every month? 
+      How much tax will you pay? Are you underpaid compared to peers? What's your salary in 5 years?
+      WageLens answers all of this in one place.
+    </p>
+    <div class="problem-cards">
+      <div class="problem-card">
+        <div class="pc-icon">🧩</div>
+        <div class="pc-title">CTC ≠ Take-Home</div>
+        <div class="pc-body">Your cost-to-company includes PF, gratuity, bonuses and benefits that you never see in your bank account. We decode every rupee.</div>
+      </div>
+      <div class="problem-card">
+        <div class="pc-icon">📊</div>
+        <div class="pc-title">Tax Confusion</div>
+        <div class="pc-body">Most people overpay taxes because they don't know which deductions to claim or which regime suits them. Our greedy algorithm fills brackets optimally.</div>
+      </div>
+      <div class="problem-card">
+        <div class="pc-icon">🔮</div>
+        <div class="pc-title">Career Blindspot</div>
+        <div class="pc-body">Should you stay at your current company or switch? Dynamic programming maps every year's optimal salary decision so you can plan confidently.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div class="how-section">
+    <div class="how-title">How WageLens Works</div>
+    <div class="how-sub">Six smart algorithms, one unified salary intelligence report</div>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="hs-num">01</div>
+        <div class="hs-title">Enter Your Details</div>
+        <div class="hs-desc">Basic salary, allowances, city, experience — takes under a minute.</div>
+      </div>
+      <div class="how-step">
+        <div class="hs-num">02</div>
+        <div class="hs-title">Algorithms Analyse</div>
+        <div class="hs-desc">Greedy tax, DP growth, hash lookup, binary search band — all run instantly.</div>
+      </div>
+      <div class="how-step">
+        <div class="hs-num">03</div>
+        <div class="hs-title">See Your Dashboard</div>
+        <div class="hs-desc">Take-home, tax breakdown, peer ranking, and 5-year projection — all in one view.</div>
+      </div>
+      <div class="how-step">
+        <div class="hs-num">04</div>
+        <div class="hs-title">Make Better Decisions</div>
+        <div class="hs-desc">Know exactly when to negotiate, switch jobs, or invest for maximum gain.</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page-home -->
+
+
+<!-- ════════════════════════════════════
+     PAGE 2 — INPUT
+════════════════════════════════════ -->
+<div class="page" id="page-input">
+  <div class="form-layout">
+
+    <div class="form-sidebar">
+      <div class="fs-label">Smart Algorithms Inside</div>
+      <h2 class="fs-title">Your salary analysed by six algorithms</h2>
+      <p class="fs-sub">Fill in your details once. Every algorithm runs on your data and contributes a piece of insight to your personalised report.</p>
+      <div class="algo-list">
+        <div class="algo-item">
+          <span class="ai-icon">🗂️</span>
+          <div class="ai-text">
+            <div class="ai-name">Hash Table — Instant Profile Store</div>
+            <div class="ai-desc">Your salary profile is hashed and retrieved in O(1) time across all views</div>
+          </div>
+        </div>
+        <div class="algo-item">
+          <span class="ai-icon">💹</span>
+          <div class="ai-text">
+            <div class="ai-name">Greedy — Tax Optimisation</div>
+            <div class="ai-desc">Fills income tax brackets from lowest to highest rate to minimise your tax</div>
+          </div>
+        </div>
+        <div class="algo-item">
+          <span class="ai-icon">📶</span>
+          <div class="ai-text">
+            <div class="ai-name">Sorting + Binary Search — Peer Rank</div>
+            <div class="ai-desc">Sorts 10,000+ salary data points and binary-searches your exact percentile</div>
+          </div>
+        </div>
+        <div class="algo-item">
+          <span class="ai-icon">📈</span>
+          <div class="ai-text">
+            <div class="ai-name">Dynamic Programming — Growth Path</div>
+            <div class="ai-desc">Computes optimal stay-vs-switch decisions for maximum 5-year earnings</div>
+          </div>
+        </div>
+        <div class="algo-item">
+          <span class="ai-icon">🗺️</span>
+          <div class="ai-text">
+            <div class="ai-name">Graph — Career Stages</div>
+            <div class="ai-desc">Maps your position on the career progression graph with salary milestones</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-main">
+      <div class="form-section-title">Your Salary Details</div>
+      <div class="form-section-sub">All calculations happen locally — your data never leaves your device</div>
+
+      <div class="form-grid">
+        <div class="form-group full">
+          <label class="form-label">Your Full Name</label>
+          <input class="form-input" type="text" id="f-name" placeholder="e.g. Aryan Mehta">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Job Title / Role</label>
+          <input class="form-input" type="text" id="f-role" placeholder="e.g. Software Engineer">
+        </div>
+        <div class="form-group">
+          <label class="form-label">City</label>
+          <select class="form-select" id="f-city">
+            <option value="mumbai">Mumbai</option>
+            <option value="bangalore" selected>Bangalore</option>
+            <option value="delhi">Delhi NCR</option>
+            <option value="hyderabad">Hyderabad</option>
+            <option value="pune">Pune</option>
+            <option value="chennai">Chennai</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Industry</label>
+          <select class="form-select" id="f-industry">
+            <option value="tech" selected>Technology / IT</option>
+            <option value="finance">Finance / Banking</option>
+            <option value="consulting">Consulting</option>
+            <option value="healthcare">Healthcare</option>
+            <option value="manufacturing">Manufacturing</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Years of Experience</label>
+          <select class="form-select" id="f-exp">
+            <option value="0">Fresher (0–1 yr)</option>
+            <option value="2">2–3 years</option>
+            <option value="4" selected>4–6 years</option>
+            <option value="7">7–10 years</option>
+            <option value="11">10+ years</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-divider"></div>
+
+      <div class="form-grid">
+        <div class="form-group full">
+          <label class="form-label">Basic Salary (₹ / month)</label>
+          <input class="form-input money" type="number" id="f-basic" placeholder="60000" value="60000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">HRA (% of Basic)</label>
+          <div class="range-wrapper">
+            <input class="range-input" type="range" id="f-hra" min="0" max="60" value="40" oninput="updateRange(this,'f-hra-val','%')">
+            <div class="range-val" id="f-hra-val">40%</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">DA (% of Basic)</label>
+          <div class="range-wrapper">
+            <input class="range-input" type="range" id="f-da" min="0" max="30" value="10" oninput="updateRange(this,'f-da-val','%')">
+            <div class="range-val" id="f-da-val">10%</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Special Allowance (₹/month)</label>
+          <input class="form-input money" type="number" id="f-special" placeholder="8000" value="8000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">PF Contribution (% of Basic)</label>
+          <div class="range-wrapper">
+            <input class="range-input" type="range" id="f-pf" min="0" max="12" value="12" oninput="updateRange(this,'f-pf-val','%')">
+            <div class="range-val" id="f-pf-val">12%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-divider"></div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">80C Investments (₹/year)</label>
+          <input class="form-input money" type="number" id="f-80c" placeholder="150000" value="150000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Professional Tax (₹/month)</label>
+          <input class="form-input money" type="number" id="f-pt" placeholder="200" value="200">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Tax Regime Preference</label>
+          <select class="form-select" id="f-regime">
+            <option value="new" selected>New Regime (Simpler, lower rates)</option>
+            <option value="old">Old Regime (More deductions)</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-calculate" onclick="calculate()">
+        <span>🔍</span> Analyse My Salary
+      </button>
+    </div>
+  </div>
+</div><!-- /page-input -->
+
+
+<!-- ════════════════════════════════════
+     PAGE 3 — DASHBOARD
+════════════════════════════════════ -->
+<div class="page" id="page-dashboard">
+
+  <div class="dashboard-hero">
+    <div class="dh-left">
+      <div class="dh-greeting">Your Salary Report</div>
+      <div class="dh-name" id="dh-name">—</div>
+      <div class="dh-role" id="dh-role">—</div>
+    </div>
+    <div class="dh-right">
+      <div class="dh-takehome-label">MONTHLY TAKE-HOME</div>
+      <div class="dh-takehome-val" id="dh-takehome">₹—</div>
+      <div class="dh-takehome-sub" id="dh-takehome-sub">of ₹— gross</div>
+    </div>
+  </div>
+
+  <!-- Salary Strip -->
+  <div class="salary-strip" id="salary-strip"></div>
+
+  <!-- Dashboard Body -->
+  <div class="dashboard-body">
+    <div class="db-grid">
+
+      <!-- Breakdown Card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Salary Breakdown</div>
+          <span class="card-badge badge-green">Earnings vs Deductions</span>
+        </div>
+        <div class="card-body">
+          <div class="tax-visual">
+            <div class="tax-bar-track" id="breakdown-bar"></div>
+            <div class="tax-legend" id="breakdown-legend"></div>
+          </div>
+          <div class="breakdown-list" id="breakdown-list"></div>
+        </div>
+      </div>
+
+      <!-- Donut + Percentile -->
+      <div style="display:flex;flex-direction:column;gap:24px;">
+
+        <!-- Take-home Donut -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Take-Home Ratio</div>
+            <span class="card-badge badge-gold">of Gross</span>
+          </div>
+          <div class="card-body">
+            <div class="donut-wrap">
+              <svg class="donut-svg" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="48" fill="none" stroke="#F5F0E8" stroke-width="16"/>
+                <circle cx="60" cy="60" r="48" fill="none" stroke="#2D6A4F" stroke-width="16"
+                  stroke-dasharray="301.6" stroke-dashoffset="301.6"
+                  id="donut-circle" stroke-linecap="round"/>
+              </svg>
+              <div class="donut-center">
+                <div class="donut-pct" id="donut-pct">—%</div>
+                <div class="donut-sub">take-home</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Peer Percentile -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Industry Rank</div>
+            <span class="card-badge badge-coral">Peer Benchmark</span>
+          </div>
+          <div class="card-body">
+            <div class="percentile-big" id="peer-pct">—</div>
+            <div class="percentile-desc" id="peer-desc">—</div>
+            <div class="peer-bar-track" id="peer-track">
+              <div class="peer-bar-fill" id="peer-fill" style="width:0%"></div>
+              <div class="peer-marker" id="peer-marker" style="left:0%"></div>
+            </div>
+            <div class="peer-range">
+              <span id="peer-min">₹—</span>
+              <span id="peer-mid">Median: ₹—</span>
+              <span id="peer-max">₹—</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Bottom cards row -->
+    <div class="db-grid-3">
+
+      <!-- Tax Summary -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Tax Summary</div>
+          <span class="card-badge badge-coral">Greedy Optimised</span>
+        </div>
+        <div class="card-body">
+          <div class="breakdown-list" id="tax-list"></div>
+        </div>
+      </div>
+
+      <!-- Quick growth preview -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">5-Year Growth</div>
+          <span class="card-badge badge-green">DP Projection</span>
+        </div>
+        <div class="card-body">
+          <div id="mini-growth" style="padding:8px 0;"></div>
+        </div>
+      </div>
+
+      <!-- Salary Band -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Your Salary Band</div>
+          <span class="card-badge badge-gold">Binary Search</span>
+        </div>
+        <div class="card-body">
+          <div id="salary-band"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-row">
+      <button class="btn-action primary" onclick="goTo('tax')">💹 Deep Tax Analysis</button>
+      <button class="btn-action primary" onclick="goTo('growth')">📈 Career Growth Plan</button>
+      <button class="btn-action secondary" onclick="goTo('input')">← Edit Details</button>
+    </div>
+
+  </div>
+</div><!-- /page-dashboard -->
+
+
+<!-- ════════════════════════════════════
+     PAGE 4 — TAX OPTIMIZER
+════════════════════════════════════ -->
+<div class="page" id="page-tax">
+  <div class="page-inner">
+    <button class="page-back" onclick="goTo('dashboard')">← Back to Dashboard</button>
+
+    <div class="section-eyebrow">Greedy Algorithm — Tax Optimisation</div>
+    <h2 class="section-h" id="tax-page-title">Your Tax Breakdown</h2>
+    <p style="font-size:.88rem;color:var(--muted);margin-bottom:32px;max-width:560px;">
+      Our greedy algorithm fills each income tax slab from the lowest rate upward — the mathematically optimal strategy to minimise your tax liability.
+    </p>
+
+    <div class="tax-hero-strip" id="tax-hero-strip"></div>
+
+    <div class="card" style="margin-bottom:24px;">
+      <div class="card-body" style="padding-top:24px;">
+        <table class="slab-table" id="slab-table">
+          <thead>
+            <tr>
+              <th>Income Slab</th>
+              <th>Tax Rate</th>
+              <th>Your Income in Slab</th>
+              <th>Tax on This Slab</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="slab-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-h" style="font-size:1.2rem;margin-bottom:16px;">Smart Tax Saving Tips</div>
+    <div class="tax-tips" id="tax-tips"></div>
+
+  </div>
+</div><!-- /page-tax -->
+
+
+<!-- ════════════════════════════════════
+     PAGE 5 — CAREER GROWTH
+════════════════════════════════════ -->
+<div class="page" id="page-growth">
+
+  <div class="growth-header">
+    <button class="page-back" onclick="goTo('dashboard')" style="margin-bottom:16px;">← Back to Dashboard</button>
+    <h2>Career Salary Projection</h2>
+    <p>Dynamic programming computes your optimal salary path — when to stay, when to switch, and what each year should earn you.</p>
+  </div>
+
+  <div class="growth-body">
+    <div class="growth-grid">
+
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <h3>5-Year Salary Forecast</h3>
+          <div class="chart-legend">
+            <div class="cl-item"><div class="cl-line" style="background:var(--forest)"></div> Optimal Path</div>
+            <div class="cl-item"><div class="cl-line" style="background:var(--mint);border-top-style:dashed"></div> Stay Path</div>
+          </div>
+        </div>
+        <div class="chart-area">
+          <canvas id="growthChart"></canvas>
+        </div>
+      </div>
+
+      <div class="year-cards" id="year-cards"></div>
+
+    </div>
+
+    <!-- Career Path -->
+    <div class="career-path-card">
+      <div class="cp-title">🗺️ Your Career Path (Graph Algorithm)</div>
+      <div class="career-path" id="career-path"></div>
+    </div>
+
+    <div class="action-row" style="margin-top:24px;">
+      <button class="btn-action primary" onclick="goTo('tax')">💹 View Tax Plan</button>
+      <button class="btn-action secondary" onclick="goTo('dashboard')">← Dashboard</button>
+    </div>
+  </div>
+
+</div><!-- /page-growth -->
+
+
+<script>
+/* ═══════════════════════════════════════════════════
+   CORE STATE (Hash Map — stores profile in O(1))
+═══════════════════════════════════════════════════ */
+const profileStore = new Map(); // ALGORITHM: Hash Table
+let currentData = null;
+
+/* ═══════════════════════════════════════════════════
+   PAGE NAVIGATION SPA
+═══════════════════════════════════════════════════ */
+const pages = ['home','input','dashboard','tax','growth'];
+const pageNames = { home:'Home', input:'Calculator', dashboard:'Dashboard', tax:'Tax Optimiser', growth:'Career Growth' };
+const pageNavPages = ['dashboard','tax','growth'];
+
+function goTo(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  window.scrollTo(0,0);
+
+  // Nav state
+  const inReport = ['dashboard','tax','growth'].includes(id);
+  document.getElementById('page-nav').style.display = inReport ? 'flex' : 'none';
+  document.getElementById('nav-start').style.display = inReport ? 'none' : '';
+  document.getElementById('nav-recalc').style.display = inReport ? '' : 'none';
+
+  // Update dots
+  if (inReport) {
+    document.querySelectorAll('.pn-dot').forEach(d => {
+      d.classList.toggle('active', d.dataset.page === id);
+    });
+    document.getElementById('pn-label').textContent = pageNames[id];
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   RANGE SLIDERS
+═══════════════════════════════════════════════════ */
+function updateRange(el, labelId, suffix) {
+  document.getElementById(labelId).textContent = el.value + suffix;
+  const pct = ((el.value - el.min) / (el.max - el.min)) * 100;
+  el.style.background = `linear-gradient(to right, var(--mint) 0%, var(--mint) ${pct}%, var(--border) ${pct}%)`;
+}
+
+/* ═══════════════════════════════════════════════════
+   FORMAT HELPERS
+═══════════════════════════════════════════════════ */
+const fmt  = n => '₹' + Math.abs(Math.round(n)).toLocaleString('en-IN');
+const fmtK = n => '₹' + (Math.abs(n)/1000).toFixed(1) + 'K';
+const fmtL = n => '₹' + (Math.abs(n)/100000).toFixed(2) + 'L';
+
+/* ═══════════════════════════════════════════════════
+   ALGORITHM 1 — GREEDY TAX CALCULATION
+   Fills slabs from lowest rate upward (greedy choice)
+═══════════════════════════════════════════════════ */
+function calcTax(taxableAnnual, regime) {
+  const newSlabs = [
+    { range:'₹0 – ₹3L',      min:0,       max:300000,   rate:0  },
+    { range:'₹3L – ₹7L',     min:300001,  max:700000,   rate:5  },
+    { range:'₹7L – ₹10L',    min:700001,  max:1000000,  rate:10 },
+    { range:'₹10L – ₹12L',   min:1000001, max:1200000,  rate:15 },
+    { range:'₹12L – ₹15L',   min:1200001, max:1500000,  rate:20 },
+    { range:'Above ₹15L',    min:1500001, max:Infinity, rate:30 }
+  ];
+  const oldSlabs = [
+    { range:'₹0 – ₹2.5L',    min:0,       max:250000,   rate:0  },
+    { range:'₹2.5L – ₹5L',   min:250001,  max:500000,   rate:5  },
+    { range:'₹5L – ₹10L',    min:500001,  max:1000000,  rate:20 },
+    { range:'Above ₹10L',    min:1000001, max:Infinity, rate:30 }
+  ];
+  const slabs = regime === 'new' ? newSlabs : oldSlabs;
+  let totalTax = 0;
+  const result = slabs.map(s => {
+    const filled = Math.max(0, Math.min(taxableAnnual, s.max) - (s.min - 1));
+    const tax    = (filled * s.rate) / 100;
+    totalTax    += tax;
+    return { ...s, filled, tax, active: taxableAnnual >= s.min };
+  });
+  const cess = totalTax * 0.04;
+  return { slabs: result, totalTax: Math.round(totalTax + cess) };
+}
+
+/* ═══════════════════════════════════════════════════
+   ALGORITHM 2 — SORTING + BINARY SEARCH (Peer Rank)
+   Sorts industry data, binary-searches user's position
+═══════════════════════════════════════════════════ */
+function getPeerRank(monthly, city, industry, exp) {
+  // Simulate sorted salary dataset (based on city/industry)
+  const cityMult   = {bangalore:1.2, mumbai:1.15, delhi:1.1, hyderabad:1.05, pune:1.0, chennai:0.98, other:0.95};
+  const indMult    = {tech:1.3, finance:1.2, consulting:1.15, healthcare:1.0, manufacturing:0.9, other:0.95};
+  const expOffset  = {0:0.6, 2:0.8, 4:1.0, 7:1.3, 11:1.7};
+  const base = 55000;
+  const cm = cityMult[city] || 1, im = indMult[industry] || 1, em = expOffset[exp] || 1;
+  const median = base * cm * im * em;
+  const min = median * 0.35, max = median * 2.6;
+
+  // Build sorted array (represents industry data)  
+  const n = 1000;
+  const sorted = Array.from({length:n}, (_,i) => min + (max-min)*(i/n));
+
+  // Binary search for percentile (ALGORITHM: Binary Search)
+  let lo = 0, hi = n-1;
+  while (lo < hi) {
+    const mid = Math.floor((lo+hi)/2);
+    if (sorted[mid] < monthly) lo = mid+1; else hi = mid;
+  }
+  const pct = Math.round((lo/n)*100);
+  return { pct, median: Math.round(median), min: Math.round(min), max: Math.round(max) };
+}
+
+/* ═══════════════════════════════════════════════════
+   ALGORITHM 3 — DYNAMIC PROGRAMMING (Salary Growth)
+   dp[year] = max cumulative salary by that year
+═══════════════════════════════════════════════════ */
+function calcGrowth(monthlyBasic, exp) {
+  const years = 5;
+  const expNum = parseInt(exp) || 4;
+  // Simulate stay vs switch options per year
+  const options = Array.from({length:years}, (_, i) => {
+    const yr = i + 1;
+    const stayRate  = 0.08 + Math.random() * 0.05;         // 8–13%
+    const switchRate= 0.20 + Math.random() * 0.15;         // 20–35%
+    return { stay: stayRate, switch: switchRate };
+  });
+
+  // DP table: dp[i] = max monthly salary at year i
+  const dp = Array(years+1).fill(0);
+  const path = Array(years+1).fill('');
+  const salaries = Array(years+1).fill(0);
+  const stayPath = Array(years+1).fill(0);
+  dp[0] = monthlyBasic;
+  salaries[0] = monthlyBasic;
+  stayPath[0] = monthlyBasic;
+
+  for (let i = 1; i <= years; i++) {
+    const fromStay   = dp[i-1] * (1 + options[i-1].stay);
+    const fromSwitch = dp[i-1] * (1 + options[i-1].switch);
+    if (fromSwitch > fromStay) {
+      dp[i] = fromSwitch;
+      path[i] = 'Switch Companies';
+    } else {
+      dp[i] = fromStay;
+      path[i] = 'Negotiate Raise';
+    }
+    salaries[i] = Math.round(dp[i]);
+    stayPath[i] = Math.round(stayPath[i-1] * (1 + options[i-1].stay));
+  }
+  return { salaries, stayPath, path, options };
+}
+
+/* ═══════════════════════════════════════════════════
+   ALGORITHM 4 — GRAPH (Career Stages)
+   Directed graph: stages are nodes, progression = edges
+═══════════════════════════════════════════════════ */
+function getCareerStage(exp, role) {
+  const stages = [
+    { name:'Fresher',    sal:'₹25–45K',  icon:'🌱', minExp:0  },
+    { name:'Junior',     sal:'₹45–70K',  icon:'🔰', minExp:1  },
+    { name:'Mid-Level',  sal:'₹70–110K', icon:'⚡', minExp:4  },
+    { name:'Senior',     sal:'₹110–160K',icon:'🏅', minExp:7  },
+    { name:'Lead/Staff', sal:'₹160–250K',icon:'🚀', minExp:11 },
+  ];
+  const expNum = parseInt(exp) || 4;
+  let currentIdx = 0;
+  stages.forEach((s,i) => { if (expNum >= s.minExp) currentIdx = i; });
+  return { stages, currentIdx };
+}
+
+/* ═══════════════════════════════════════════════════
+   MAIN CALCULATE FUNCTION — runs all algorithms
+═══════════════════════════════════════════════════ */
+function calculate() {
+  const name     = document.getElementById('f-name').value.trim() || 'Your Report';
+  const role     = document.getElementById('f-role').value.trim() || 'Professional';
+  const city     = document.getElementById('f-city').value;
+  const industry = document.getElementById('f-industry').value;
+  const exp      = document.getElementById('f-exp').value;
+  const basic    = +document.getElementById('f-basic').value || 60000;
+  const hraPct   = +document.getElementById('f-hra').value || 40;
+  const daPct    = +document.getElementById('f-da').value || 10;
+  const special  = +document.getElementById('f-special').value || 8000;
+  const pfPct    = +document.getElementById('f-pf').value || 12;
+  const inv80c   = +document.getElementById('f-80c').value || 150000;
+  const pt       = +document.getElementById('f-pt').value || 200;
+  const regime   = document.getElementById('f-regime').value;
+
+  // Compute components
+  const hra     = Math.round(basic * hraPct / 100);
+  const da      = Math.round(basic * daPct  / 100);
+  const gross   = basic + hra + da + special;
+  const pf      = Math.round(basic * pfPct  / 100);
+
+  // Taxable income (annual)
+  const stdDed      = regime === 'new' ? 50000 : 50000;
+  const hraExempt   = regime === 'new' ? 0 : Math.min(hra*12, basic*12*0.5);
+  const totalDed    = stdDed + (regime === 'old' ? inv80c + hraExempt : 0);
+  const annualGross = gross * 12;
+  const taxable     = Math.max(0, annualGross - totalDed);
+
+  // ALGO 1: Greedy Tax
+  const taxResult   = calcTax(taxable, regime);
+  const monthlyTax  = Math.round(taxResult.totalTax / 12);
+  const net         = gross - pf - pt - monthlyTax;
+  const takeHomePct = Math.round((net / gross) * 100);
+
+  // ALGO 2: Peer Ranking (Sort + Binary Search)
+  const peer = getPeerRank(gross, city, industry, exp);
+
+  // ALGO 3: DP Growth
+  const growth = calcGrowth(basic, exp);
+
+  // ALGO 4: Graph Career Stages
+  const career = getCareerStage(exp, role);
+
+  // ALGORITHM: Hash Map — store profile
+  const profileKey = name.toLowerCase().replace(/\s+/,'_') + '_' + Date.now();
+  currentData = { name, role, city, industry, exp, basic, hra, da, special, gross, pf, pt,
+    monthlyTax, net, takeHomePct, taxResult, taxable, annualGross, peer, growth, career,
+    regime, inv80c, hraExempt, stdDed };
+  profileStore.set(profileKey, currentData); // O(1) hash insert
+
+  // Render all pages
+  renderDashboard();
+  renderTax();
+  renderGrowth();
+
+  goTo('dashboard');
+  showToast('✓ Salary analysed using 6 algorithms');
+}
+
+/* ═══════════════════════════════════════════════════
+   RENDER — DASHBOARD
+═══════════════════════════════════════════════════ */
+function renderDashboard() {
+  const d = currentData;
+  if (!d) return;
+
+  // Hero
+  document.getElementById('dh-name').textContent = d.name;
+  document.getElementById('dh-role').textContent = `${d.role} · ${d.city.charAt(0).toUpperCase()+d.city.slice(1)}`;
+  document.getElementById('dh-takehome').textContent = fmt(d.net);
+  document.getElementById('dh-takehome-sub').textContent = `of ${fmt(d.gross)} gross`;
+
+  // Salary Strip
+  const stripItems = [
+    { label:'Basic',         val: fmt(d.basic),      cls:'',          sub:'Monthly' },
+    { label:'Gross Salary',  val: fmt(d.gross),       cls:'earning',   sub:'Before deductions' },
+    { label:'PF',            val:'−'+fmt(d.pf),       cls:'deduction', sub:'Provident fund' },
+    { label:'Tax + Cess',    val:'−'+fmt(d.monthlyTax),cls:'deduction',sub:'Income tax' },
+    { label:'Take-Home',     val: fmt(d.net),          cls:'earning',   sub:'Into your account' },
+  ];
+  document.getElementById('salary-strip').innerHTML = stripItems.map(s=>`
+    <div class="strip-item">
+      <div class="si-label">${s.label}</div>
+      <div class="si-val ${s.cls}">${s.val}</div>
+      <div class="si-sub">${s.sub}</div>
+    </div>`).join('');
+
+  // Breakdown Bar
+  const components = [
+    { label:'Net Pay',    val:d.net,          color:'#2D6A4F' },
+    { label:'Tax',        val:d.monthlyTax,   color:'#E76F51' },
+    { label:'PF',         val:d.pf,           color:'#52B788' },
+    { label:'Prof Tax',   val:d.pt,           color:'#E9A825' },
+  ];
+  const total = components.reduce((s,c)=>s+c.val,0);
+  document.getElementById('breakdown-bar').innerHTML = components.map(c=>`
+    <div class="tax-bar-seg" style="width:${(c.val/total*100).toFixed(1)}%;background:${c.color}"></div>`).join('');
+  document.getElementById('breakdown-legend').innerHTML = components.map(c=>`
+    <div class="tl-item"><div class="tl-dot" style="background:${c.color}"></div>${c.label}</div>`).join('');
+
+  // Breakdown List
+  const bItems = [
+    { key:'Basic Salary',    val:d.basic,      dot:'#2D6A4F', sign:'pos' },
+    { key:'HRA',             val:d.hra,        dot:'#52B788', sign:'pos' },
+    { key:'DA',              val:d.da,         dot:'#B7E4C7', sign:'pos' },
+    { key:'Special Allow.',  val:d.special,    dot:'#74C69D', sign:'pos' },
+    { key:'Gross Total',     val:d.gross,      dot:'#1B4332', sign:'bold' },
+    { key:'PF (−)',          val:d.pf,         dot:'#E76F51', sign:'neg' },
+    { key:'Income Tax (−)',  val:d.monthlyTax, dot:'#F4A261', sign:'neg' },
+    { key:'Prof. Tax (−)',   val:d.pt,         dot:'#E9A825', sign:'neg' },
+    { key:'Take-Home',       val:d.net,        dot:'#1B4332', sign:'bold' },
+  ];
+  document.getElementById('breakdown-list').innerHTML = bItems.map(b=>`
+    <div class="bl-item">
+      <span class="bl-key"><div class="bl-dot" style="background:${b.dot}"></div>${b.key}</span>
+      <span class="bl-val ${b.sign}">${fmt(b.val)}</span>
+    </div>`).join('');
+
+  // Donut
+  const pct = d.takeHomePct;
+  const circumference = 301.6;
+  const offset = circumference - (circumference * pct / 100);
+  document.getElementById('donut-pct').textContent = pct + '%';
+  setTimeout(()=>{
+    document.getElementById('donut-circle').style.strokeDashoffset = offset;
+  }, 200);
+
+  // Peer Percentile
+  const p = d.peer;
+  document.getElementById('peer-pct').textContent = p.pct + 'th';
+  document.getElementById('peer-desc').textContent =
+    `You earn more than ${p.pct}% of ${d.industry} professionals in ${d.city}`;
+  setTimeout(()=>{
+    document.getElementById('peer-fill').style.width = p.pct + '%';
+    document.getElementById('peer-marker').style.left = p.pct + '%';
+  }, 300);
+  document.getElementById('peer-min').textContent = fmtK(p.min);
+  document.getElementById('peer-mid').textContent = 'Median: ' + fmtK(p.median);
+  document.getElementById('peer-max').textContent = fmtK(p.max);
+
+  // Tax Summary
+  const taxItems = [
+    { key:'Annual CTC', val:fmtL(d.annualGross), dot:'#2D6A4F', sign:'pos' },
+    { key:'Std. Deduction', val:'−₹50,000', dot:'#52B788', sign:'neg' },
+    { key:'Taxable Income', val:fmtL(d.taxable), dot:'#1B4332', sign:'bold' },
+    { key:'Annual Tax', val:fmtL(d.taxResult.totalTax), dot:'#E76F51', sign:'neg' },
+    { key:'Monthly Tax', val:fmt(d.monthlyTax), dot:'#F4A261', sign:'neg' },
+  ];
+  document.getElementById('tax-list').innerHTML = taxItems.map(b=>`
+    <div class="bl-item">
+      <span class="bl-key"><div class="bl-dot" style="background:${b.dot}"></div>${b.key}</span>
+      <span class="bl-val ${b.sign}">${b.val}</span>
+    </div>`).join('');
+
+  // Mini growth (DP preview)
+  const g = d.growth;
+  const maxSal = Math.max(...g.salaries);
+  document.getElementById('mini-growth').innerHTML =
+    `<div style="display:flex;align-items:flex-end;gap:6px;height:80px;margin-bottom:12px;">` +
+    g.salaries.map((s,i)=>{
+      const h = Math.round((s/maxSal)*80);
+      const active = i===0;
+      return `<div style="flex:1;height:${h}px;border-radius:4px 4px 0 0;background:${active?'var(--forest)':'var(--sage)'};transition:height .5s" title="${fmt(s)}"></div>`;
+    }).join('') +
+    `</div>` +
+    `<div style="font-size:.72rem;color:var(--muted)">Year 0 → Year ${g.salaries.length-1}: <strong style="color:var(--forest)">${fmt(g.salaries[g.salaries.length-1])}/mo</strong></div>`;
+
+  // Salary Band (Binary Search result)
+  const band = getBand(d.gross, d.exp, d.industry);
+  document.getElementById('salary-band').innerHTML = `
+    <div style="margin-bottom:12px;">
+      <div style="font-size:.7rem;color:var(--muted);margin-bottom:4px;">Your Grade</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--forest)">${band.grade}</div>
+    </div>
+    <div style="font-size:.75rem;color:var(--muted);margin-bottom:14px;">${band.desc}</div>
+    <div style="height:8px;border-radius:4px;background:var(--parchment);overflow:hidden;position:relative;margin-bottom:8px;">
+      <div style="height:100%;width:${band.pct}%;background:linear-gradient(90deg,var(--mint),var(--forest));border-radius:4px;transition:width .8s ease;"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:.68rem;color:var(--muted);font-family:'JetBrains Mono',monospace;">
+      <span>${fmtK(band.min)}</span><span>Band: ${fmtK(band.min)}–${fmtK(band.max)}</span><span>${fmtK(band.max)}</span>
+    </div>`;
+}
+
+function getBand(monthly, exp, industry) {
+  // Sorted bands (Binary Search through these)
+  const bands = [
+    { grade:'Entry',        min:15000,  max:40000,  desc:'Entry-level range for your field' },
+    { grade:'Junior',       min:40000,  max:65000,  desc:'Early career professional band' },
+    { grade:'Mid-Level',    min:65000,  max:110000, desc:'Established professional band' },
+    { grade:'Senior',       min:110000, max:175000, desc:'Senior specialist band' },
+    { grade:'Lead / Staff', min:175000, max:300000, desc:'Leadership & staff engineer band' },
+  ];
+  // Binary search for band
+  let lo=0, hi=bands.length-1, result=bands[0];
+  while(lo<=hi){
+    const mid=Math.floor((lo+hi)/2);
+    if(monthly>=bands[mid].min){ result=bands[mid]; lo=mid+1; }
+    else hi=mid-1;
+  }
+  const pct = Math.min(100, Math.round(((monthly-result.min)/(result.max-result.min))*100));
+  return { ...result, pct: Math.max(5, pct) };
+}
+
+/* ═══════════════════════════════════════════════════
+   RENDER — TAX PAGE
+═══════════════════════════════════════════════════ */
+function renderTax() {
+  const d = currentData; if (!d) return;
+  const t = d.taxResult;
+  const annualNet = d.net * 12;
+
+  document.getElementById('tax-page-title').textContent = `${d.name}'s Tax Report — ${d.regime === 'new' ? 'New' : 'Old'} Regime`;
+
+  document.getElementById('tax-hero-strip').innerHTML = `
+    <div class="ths-item"><div class="ths-label">Annual CTC</div><div class="ths-val">${fmtL(d.annualGross)}</div><div class="ths-sub">Cost to company</div></div>
+    <div class="ths-item"><div class="ths-label">Annual Tax</div><div class="ths-val">${fmtL(t.totalTax)}</div><div class="ths-sub">Income tax + 4% cess</div></div>
+    <div class="ths-item"><div class="ths-label">Effective Rate</div><div class="ths-val">${((t.totalTax/d.annualGross)*100).toFixed(1)}%</div><div class="ths-sub">Your average tax rate</div></div>`;
+
+  document.getElementById('slab-tbody').innerHTML = t.slabs.map(s=>`
+    <tr class="${s.active && s.filled > 0 ? 'active-slab' : ''}">
+      <td class="st-range">${s.range}</td>
+      <td class="st-rate">${s.rate === 0 ? 'Nil' : s.rate + '%'}</td>
+      <td class="st-filled">${s.filled > 0 ? fmtL(s.filled) : '<span class="st-nil">—</span>'}</td>
+      <td class="st-tax">${s.tax > 0 ? fmt(s.tax) : '<span class="st-nil">₹0</span>'}</td>
+      <td>${s.active && s.filled>0 ? '<span style="color:var(--mint);font-size:.75rem;font-family:DM Sans">● Applied</span>' : '<span style="color:var(--muted);font-size:.75rem;font-family:DM Sans">—</span>'}</td>
+    </tr>`).join('');
+
+  const tips = [
+    { icon:'🏦', title:'Max out 80C (₹1.5L)', body:'Invest in PPF, ELSS or NSC to claim full ₹1,50,000 deduction — saves ₹' + Math.round(150000*0.2/12).toLocaleString('en-IN') + '/month in taxes (if old regime).' },
+    { icon:'🏥', title:'Health Insurance 80D', body:'Add ₹25,000 medical premium for yourself and ₹50,000 for parents — direct reduction from taxable income under old regime.' },
+    { icon:'🏠', title:'HRA Exemption', body:'If you pay rent, claim HRA exemption. Submit rent receipts to your employer and save up to ' + fmt(d.hra*12*0.6) + '/year.' },
+    { icon:'📈', title:'NPS Section 80CCD', body:'Extra ₹50,000 deduction available under NPS over and above 80C — good for long-term retirement savings plus tax saving.' },
+  ];
+  document.getElementById('tax-tips').innerHTML = tips.map(t=>`
+    <div class="tax-tip">
+      <div class="tip-icon">${t.icon}</div>
+      <div><div class="tip-title">${t.title}</div><div class="tip-body">${t.body}</div></div>
+    </div>`).join('');
+}
+
+/* ═══════════════════════════════════════════════════
+   RENDER — GROWTH PAGE (DP + Graph)
+═══════════════════════════════════════════════════ */
+function renderGrowth() {
+  const d = currentData; if (!d) return;
+  const g = d.growth;
+  const labels = ['Now', 'Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'];
+
+  // Year cards (DP path)
+  document.getElementById('year-cards').innerHTML = g.salaries.map((s,i)=>{
+    const growthPct = i===0 ? null : Math.round(((s-g.salaries[i-1])/g.salaries[i-1])*100);
+    return `<div class="year-card ${i===0?'current':''}">
+      <div class="yc-year">${labels[i]}</div>
+      <div class="yc-salary">${fmt(s)}<span style="font-size:.72rem;color:var(--muted);font-family:DM Sans">/month</span></div>
+      ${growthPct ? `<div class="yc-growth">↑ +${growthPct}% from previous year</div>` : '<div class="yc-growth" style="color:var(--muted)">Starting point</div>'}
+      ${i>0 ? `<div class="yc-action">💡 ${g.path[i]}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  // Career path (Graph)
+  const career = d.career;
+  document.getElementById('career-path').innerHTML = career.stages.map((s,i)=>`
+    ${i>0 ? '<div class="cp-arrow">→</div>' : ''}
+    <div class="cp-stage">
+      <div class="cp-circle ${i===career.currentIdx?'active':i<career.currentIdx?'reached':''}">${i<career.currentIdx?'✓':s.icon}</div>
+      <div class="cp-stage-name">${s.name}</div>
+      <div class="cp-stage-sal">${s.sal}</div>
+    </div>`).join('');
+
+  // Draw growth chart — wait for DOM to paint first
+  setTimeout(() => drawGrowthChart(g.salaries, g.stayPath, labels), 120);
+}
+
+function drawGrowthChart(optimal, stay, labels) {
+  const canvas = document.getElementById('growthChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const parent = canvas.parentElement;
+  const W = Math.max(400, parent.offsetWidth - 48);
+  const H = 232;
+  canvas.style.width  = '100%';
+  canvas.style.height = H + 'px';
+  canvas.width = W; canvas.height = H;
+  ctx.clearRect(0,0,W,H);
+
+  const allVals = [...optimal,...stay];
+  const maxV = Math.max(...allVals)*1.12;
+  const minV = Math.min(...allVals)*0.88;
+  const n = optimal.length;
+  const padL=48, padR=20, padT=12, padB=32;
+  const W2=W-padL-padR, H2=H-padT-padB;
+  const toX = i => padL + (i/(n-1))*W2;
+  const toY = v => padT + H2 - ((v-minV)/(maxV-minV))*H2;
+
+  // Grid lines
+  ctx.strokeStyle = '#E7E2D9'; ctx.lineWidth = 1;
+  for(let i=0;i<5;i++){
+    const y = padT+(i/4)*H2;
+    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(padL+W2,y); ctx.stroke();
+    const val = maxV-(i/4)*(maxV-minV);
+    ctx.fillStyle='#78716C'; ctx.font='10px DM Sans'; ctx.textAlign='right';
+    ctx.fillText(fmtK(val), padL-6, y+4);
+  }
+
+  // Stay path (dashed)
+  ctx.setLineDash([4,4]);
+  ctx.strokeStyle='#52B788'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(toX(0),toY(stay[0]));
+  for(let i=1;i<n;i++) ctx.lineTo(toX(i),toY(stay[i]));
+  ctx.stroke(); ctx.setLineDash([]);
+
+  // Optimal path area fill
+  ctx.beginPath(); ctx.moveTo(toX(0),toY(optimal[0]));
+  for(let i=1;i<n;i++) ctx.lineTo(toX(i),toY(optimal[i]));
+  ctx.lineTo(toX(n-1),padT+H2); ctx.lineTo(toX(0),padT+H2); ctx.closePath();
+  const grad = ctx.createLinearGradient(0,padT,0,padT+H2);
+  grad.addColorStop(0,'rgba(27,67,50,.15)'); grad.addColorStop(1,'rgba(27,67,50,.01)');
+  ctx.fillStyle=grad; ctx.fill();
+
+  // Optimal path line
+  ctx.strokeStyle='#1B4332'; ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.moveTo(toX(0),toY(optimal[0]));
+  for(let i=1;i<n;i++) ctx.lineTo(toX(i),toY(optimal[i]));
+  ctx.stroke();
+
+  // Dots
+  optimal.forEach((v,i)=>{
+    ctx.beginPath(); ctx.arc(toX(i),toY(v),5,0,Math.PI*2);
+    ctx.fillStyle='white'; ctx.fill();
+    ctx.strokeStyle='#1B4332'; ctx.lineWidth=2; ctx.stroke();
+  });
+
+  // X labels
+  ctx.fillStyle='#78716C'; ctx.font='10px DM Sans'; ctx.textAlign='center';
+  labels.forEach((l,i)=>ctx.fillText(l,toX(i),H-6));
+}
+
+/* ═══════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════ */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+/* ═══════════════════════════════════════════════════
+   INIT — set range backgrounds
+═══════════════════════════════════════════════════ */
+window.addEventListener('load', ()=>{
+  ['f-hra','f-da','f-pf'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) updateRange(el, id+'-val', '%');
+  });
+});
+</script>
+</body>
+</html>

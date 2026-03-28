@@ -1,0 +1,213 @@
+<!-- ============================================
+     sections/calculator.html
+     Full Salary Calculator — Standalone Preview
+============================================ -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Salary Calculator — DAA Salary Engine</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Unbounded:wght@700;900&family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#050810;--bg2:#080d1a;--surface:#0d1424;--border:#1a2540;--accent1:#00f5c4;--accent2:#ff6b35;--accent3:#7c3fff;--accent4:#ffd23f;--text:#e8eaf6;--text2:#7a8db5;--glow1:0 0 20px rgba(0,245,196,0.4);}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;padding:60px 40px;}
+
+    .section-label{font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--accent2);margin-bottom:10px;}
+    .section-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:2.2rem;line-height:1.15;margin-bottom:16px;}
+    .section-desc{color:var(--text2);font-size:.82rem;line-height:1.9;max-width:580px;margin-bottom:40px;}
+    .tag-orange{color:var(--accent2);}
+    .complexity{display:inline-flex;align-items:center;gap:8px;font-family:'Inconsolata',monospace;font-size:.75rem;color:var(--accent4);background:rgba(255,210,63,.08);border:1px solid rgba(255,210,63,.2);padding:4px 12px;border-radius:4px;margin-bottom:30px;}
+
+    /* Algorithm tags */
+    .algo-tags{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:30px;}
+    .algo-tag{font-size:.62rem;padding:4px 12px;border-radius:20px;font-weight:700;letter-spacing:.05em;}
+    .at-teal  {background:rgba(0,245,196,.1);color:var(--accent1);border:1px solid rgba(0,245,196,.2);}
+    .at-orange{background:rgba(255,107,53,.1);color:var(--accent2);border:1px solid rgba(255,107,53,.2);}
+    .at-violet{background:rgba(124,63,255,.1);color:var(--accent3);border:1px solid rgba(124,63,255,.2);}
+    .at-gold  {background:rgba(255,210,63,.1);color:var(--accent4);border:1px solid rgba(255,210,63,.2);}
+
+    .calc-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+    .calc-header{background:linear-gradient(135deg,rgba(0,245,196,.1),rgba(124,63,255,.1));padding:28px 32px;border-bottom:1px solid var(--border);}
+    .calc-header h3{font-family:'Unbounded',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:4px;}
+    .calc-header p{color:var(--text2);font-size:.72rem;}
+    .calc-body{padding:32px;}
+    .calc-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:28px;}
+    .form-field{display:flex;flex-direction:column;gap:6px;}
+    .form-field label{font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);}
+
+    .fancy-input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 12px;font-family:'Inconsolata',monospace;font-size:.85rem;border-radius:4px;outline:none;transition:border-color .2s;}
+    .fancy-input:focus{border-color:var(--accent1);}
+    .fancy-input::-webkit-inner-spin-button{opacity:0;}
+
+    .btn-primary{padding:10px 24px;border-radius:4px;font-family:'Space Mono',monospace;font-size:.7rem;letter-spacing:.08em;font-weight:700;cursor:pointer;border:none;background:var(--accent1);color:#000;transition:all .2s;text-transform:uppercase;}
+    .btn-primary:hover{box-shadow:var(--glow1);transform:translateY(-1px);}
+
+    .calc-output{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:24px;}
+    .output-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:18px 16px;text-align:center;transition:border-color .3s;}
+    .output-card:hover{border-color:var(--accent1);}
+    .output-card .oc-label{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);margin-bottom:8px;}
+    .output-card .oc-val{font-family:'Unbounded',sans-serif;font-size:1.1rem;font-weight:700;}
+
+    /* Breakdown table */
+    .breakdown{
+      margin-top:30px;background:var(--bg);border:1px solid var(--border);
+      border-radius:8px;overflow:hidden;
+    }
+    .breakdown-header{padding:14px 20px;background:rgba(0,245,196,.05);border-bottom:1px solid var(--border);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent1);}
+    .breakdown-row{display:flex;justify-content:space-between;padding:10px 20px;border-bottom:1px solid var(--border);font-size:.72rem;font-family:'Inconsolata',monospace;}
+    .breakdown-row:last-child{border-bottom:none;}
+    .breakdown-row .bk{color:var(--text2);}
+    .breakdown-row .bv{font-weight:700;}
+    .breakdown-row.earning .bv{color:var(--accent1);}
+    .breakdown-row.deduction .bv{color:var(--accent2);}
+    .breakdown-row.total .bv{color:var(--accent4);font-size:.9rem;}
+    .breakdown-row.total{background:rgba(255,210,63,.04);}
+
+    /* Algorithm flow diagram */
+    .algo-flow{
+      margin-top:30px;display:flex;align-items:center;gap:0;flex-wrap:wrap;
+      background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px;
+    }
+    .flow-step{text-align:center;flex:1;min-width:120px;padding:10px;}
+    .flow-step .fs-num{font-family:'Unbounded',sans-serif;font-size:1.4rem;font-weight:900;margin-bottom:4px;}
+    .flow-step .fs-name{font-size:.62rem;letter-spacing:.05em;font-weight:700;margin-bottom:4px;}
+    .flow-step .fs-desc{font-size:.58rem;color:var(--text2);line-height:1.6;}
+    .flow-arrow{color:var(--border);font-size:1.2rem;flex-shrink:0;}
+
+    @media(max-width:900px){.calc-grid{grid-template-columns:1fr 1fr;}.calc-output{grid-template-columns:1fr 1fr;}}
+    @media(max-width:600px){.calc-grid{grid-template-columns:1fr;}.algo-flow{flex-direction:column;}.flow-arrow{transform:rotate(90deg);}}
+  </style>
+</head>
+<body>
+
+  <div class="section-label">Final Module — Full Integrated System</div>
+  <h2 class="section-title">Complete Salary <span class="tag-orange">Calculator</span></h2>
+  <p class="section-desc">This module integrates all DAA algorithms into one unified payroll engine. Hash table for O(1) lookup, Greedy for tax, DP for increment optimization, and Sorting for grade comparison.</p>
+  <div class="complexity">⏱ Combined: O(1) lookup + O(k) tax + O(n) components = O(n) overall</div>
+
+  <!-- Algorithm tags used -->
+  <div class="algo-tags">
+    <span class="algo-tag at-teal">✓ Hashing — O(1) lookup</span>
+    <span class="algo-tag at-orange">✓ Greedy — Tax slabs</span>
+    <span class="algo-tag at-violet">✓ DP — Increment optimization</span>
+    <span class="algo-tag at-gold">✓ Sorting — Grade ranking</span>
+  </div>
+
+  <!-- Algorithm flow -->
+  <div class="algo-flow">
+    <div class="flow-step">
+      <div class="fs-num" style="color:var(--accent4)">①</div>
+      <div class="fs-name" style="color:var(--accent4)">Hash Lookup</div>
+      <div class="fs-desc">Fetch employee record in O(1) using EmpID as hash key</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="fs-num" style="color:var(--accent1)">②</div>
+      <div class="fs-name" style="color:var(--accent1)">Compute Components</div>
+      <div class="fs-desc">Basic + HRA + DA + Special = Gross Salary</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="fs-num" style="color:var(--accent2)">③</div>
+      <div class="fs-name" style="color:var(--accent2)">Greedy Tax</div>
+      <div class="fs-desc">Fill tax slabs greedily from 0% to 30%</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="fs-num" style="color:var(--accent3)">④</div>
+      <div class="fs-name" style="color:var(--accent3)">Net Take-Home</div>
+      <div class="fs-desc">Gross − PF − Tax − PT = Final CTC</div>
+    </div>
+  </div>
+
+  <!-- Calculator -->
+  <div class="calc-wrap" style="margin-top:30px;">
+    <div class="calc-header">
+      <h3>₹ Payroll Algorithm Engine</h3>
+      <p>Uses Greedy (tax) + Hashing (lookup) + Sorting (grade) to compute final take-home salary</p>
+    </div>
+    <div class="calc-body">
+      <div class="calc-grid">
+        <div class="form-field">
+          <label>Basic Salary (₹/month)</label>
+          <input class="fancy-input" type="number" id="c-basic"   value="60000" oninput="fullCalc()">
+        </div>
+        <div class="form-field">
+          <label>HRA (%)</label>
+          <input class="fancy-input" type="number" id="c-hra-pct" value="40"    oninput="fullCalc()">
+        </div>
+        <div class="form-field">
+          <label>DA (%)</label>
+          <input class="fancy-input" type="number" id="c-da"      value="10"    oninput="fullCalc()">
+        </div>
+        <div class="form-field">
+          <label>Special Allowance (₹)</label>
+          <input class="fancy-input" type="number" id="c-special" value="8000"  oninput="fullCalc()">
+        </div>
+        <div class="form-field">
+          <label>PF Contribution (%)</label>
+          <input class="fancy-input" type="number" id="c-pf"      value="12"    oninput="fullCalc()">
+        </div>
+        <div class="form-field">
+          <label>Professional Tax (₹/mo)</label>
+          <input class="fancy-input" type="number" id="c-pt"      value="200"   oninput="fullCalc()">
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="fullCalc()">▶ Calculate All Components</button>
+
+      <div class="calc-output" id="calc-output"></div>
+
+      <!-- Detailed Breakdown -->
+      <div class="breakdown" id="breakdown"></div>
+    </div>
+  </div>
+
+  <script>
+    function fullCalc(){
+      const basic  =+document.getElementById('c-basic').value   ||0;
+      const hraPct =+document.getElementById('c-hra-pct').value ||0;
+      const daPct  =+document.getElementById('c-da').value      ||0;
+      const special=+document.getElementById('c-special').value ||0;
+      const pfPct  =+document.getElementById('c-pf').value      ||0;
+      const pt     =+document.getElementById('c-pt').value      ||0;
+
+      const hra  =Math.round(basic*hraPct/100);
+      const da   =Math.round(basic*daPct/100);
+      const gross=basic+hra+da+special;
+      const pf   =Math.round(basic*pfPct/100);
+
+      const annualTaxable=Math.max(0,(gross-hra)*12-50000-150000);
+      const newSlabs=[{min:0,max:300000,r:0},{min:300001,max:700000,r:5},{min:700001,max:1000000,r:10},{min:1000001,max:1200000,r:15},{min:1200001,max:1500000,r:20},{min:1500001,max:Infinity,r:30}];
+      let annualTax=0;
+      newSlabs.forEach(s=>{const f=Math.max(0,Math.min(annualTaxable,s.max)-(s.min-1));annualTax+=f*s.r/100;});
+      const monthlyTax=Math.round((annualTax*1.04)/12);
+      const net=gross-pf-pt-monthlyTax;
+      const fmt=n=>'₹'+Math.abs(n).toLocaleString('en-IN');
+
+      const items=[
+        {label:'Gross Salary',  val:fmt(gross),      color:'#00f5c4'},
+        {label:'Monthly Tax',   val:fmt(monthlyTax), color:'#ff6b35'},
+        {label:'PF Deduction',  val:fmt(pf),         color:'#7c3fff'},
+        {label:'Net Take-Home', val:fmt(net),        color:'#ffd23f'},
+      ];
+      document.getElementById('calc-output').innerHTML=items.map(it=>`<div class="output-card"><div class="oc-label">${it.label}</div><div class="oc-val" style="color:${it.color}">${it.val}</div></div>`).join('');
+
+      document.getElementById('breakdown').innerHTML=`
+        <div class="breakdown-header">Detailed Salary Breakdown</div>
+        <div class="breakdown-row earning"><span class="bk">Basic Salary</span><span class="bv">${fmt(basic)}</span></div>
+        <div class="breakdown-row earning"><span class="bk">HRA (${hraPct}%)</span><span class="bv">${fmt(hra)}</span></div>
+        <div class="breakdown-row earning"><span class="bk">DA (${daPct}%)</span><span class="bv">${fmt(da)}</span></div>
+        <div class="breakdown-row earning"><span class="bk">Special Allowance</span><span class="bv">${fmt(special)}</span></div>
+        <div class="breakdown-row earning" style="background:rgba(0,245,196,.04)"><span class="bk">Gross Salary</span><span class="bv" style="color:var(--accent1)">${fmt(gross)}</span></div>
+        <div class="breakdown-row deduction"><span class="bk">PF Contribution (${pfPct}%)</span><span class="bv">− ${fmt(pf)}</span></div>
+        <div class="breakdown-row deduction"><span class="bk">Professional Tax</span><span class="bv">− ${fmt(pt)}</span></div>
+        <div class="breakdown-row deduction"><span class="bk">Income Tax + Cess (Greedy)</span><span class="bv">− ${fmt(monthlyTax)}</span></div>
+        <div class="breakdown-row total"><span class="bk">NET TAKE-HOME / MONTH</span><span class="bv">${fmt(net)}</span></div>`;
+    }
+    fullCalc();
+  </script>
+</body>
+</html>

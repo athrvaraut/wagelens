@@ -1,0 +1,160 @@
+<!-- ============================================
+     sections/greedy.html
+     Greedy Tax Optimizer — Standalone Preview
+============================================ -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Greedy — DAA Salary Engine</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Unbounded:wght@700;900&family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#050810;--bg2:#080d1a;--surface:#0d1424;--border:#1a2540;--accent1:#00f5c4;--accent2:#ff6b35;--accent3:#7c3fff;--accent4:#ffd23f;--text:#e8eaf6;--text2:#7a8db5;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;padding:60px 40px;}
+
+    .section-label{font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--accent2);margin-bottom:10px;}
+    .section-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:2.2rem;line-height:1.15;margin-bottom:16px;}
+    .section-desc{color:var(--text2);font-size:.82rem;line-height:1.9;max-width:580px;margin-bottom:24px;}
+    .tag-orange{color:var(--accent2);}
+
+    .complexity{display:inline-flex;align-items:center;gap:8px;font-family:'Inconsolata',monospace;font-size:.75rem;color:var(--accent4);background:rgba(255,210,63,.08);border:1px solid rgba(255,210,63,.2);padding:4px 12px;border-radius:4px;margin-bottom:30px;}
+
+    /* Greedy concept box */
+    .concept-box{
+      background:rgba(255,107,53,.05);border:1px solid rgba(255,107,53,.2);
+      border-radius:8px;padding:20px;margin-bottom:30px;
+      display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;
+    }
+    .concept-step{text-align:center;}
+    .concept-step .step-num{font-family:'Unbounded',sans-serif;font-size:2rem;font-weight:900;color:var(--accent2);}
+    .concept-step .step-title{font-size:.72rem;color:var(--accent1);margin:6px 0;font-weight:700;}
+    .concept-step .step-desc{font-size:.64rem;color:var(--text2);line-height:1.7;}
+
+    .greedy-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:28px;}
+    .card-title{font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text2);margin-bottom:18px;}
+
+    .input-row{display:flex;gap:12px;align-items:center;margin-bottom:14px;}
+    .input-row label{font-size:.7rem;color:var(--text2);min-width:140px;}
+    .fancy-input{flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px;font-family:'Inconsolata',monospace;font-size:.85rem;border-radius:4px;outline:none;transition:border-color .2s;}
+    .fancy-input:focus{border-color:var(--accent1);}
+    .fancy-input::-webkit-inner-spin-button{opacity:0;}
+
+    .bracket-table{width:100%;border-collapse:collapse;}
+    .bracket-table th,.bracket-table td{padding:9px 12px;text-align:left;font-size:.7rem;font-family:'Inconsolata',monospace;border-bottom:1px solid var(--border);}
+    .bracket-table th{color:var(--text2);letter-spacing:.08em;}
+    .bracket-table tr.active-row td{color:var(--accent4);}
+    .bracket-table .tax-pct{color:var(--accent2);}
+
+    .greedy-result{margin-top:20px;padding:18px;background:rgba(0,245,196,.06);border:1px solid rgba(0,245,196,.2);border-radius:6px;}
+    .result-row{display:flex;justify-content:space-between;font-size:.75rem;margin-bottom:8px;}
+    .result-row:last-child{margin-bottom:0;}
+    .result-key{color:var(--text2);}
+    .result-val{color:var(--accent1);font-family:'Inconsolata',monospace;font-weight:700;}
+    .result-val.red{color:var(--accent2);}
+    .result-val.gold{color:var(--accent4);}
+
+    /* Greedy property proof box */
+    .proof-box{
+      margin-top:30px;background:var(--surface);border:1px solid var(--border);
+      border-radius:8px;padding:24px;
+    }
+    .proof-box h4{color:var(--accent3);font-size:.8rem;margin-bottom:14px;letter-spacing:.05em;}
+    .proof-box p{font-size:.72rem;color:var(--text2);line-height:1.9;margin-bottom:8px;}
+    .proof-box .highlight{color:var(--accent1);}
+
+    @media(max-width:768px){.greedy-grid,.concept-box{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+
+  <div class="section-label">Algorithm 02 — Greedy Approach</div>
+  <h2 class="section-title">Tax Bracket <span class="tag-orange">Optimizer</span></h2>
+  <p class="section-desc">Greedy algorithms make the locally optimal choice at each stage with the hope of finding a global optimum. In tax computation, we greedily fill each slab from lowest to highest rate.</p>
+  <div class="complexity">⏱ Time: O(k) where k = number of tax brackets &nbsp;|&nbsp; Space: O(1)</div>
+
+  <!-- Greedy Steps -->
+  <div class="concept-box">
+    <div class="concept-step">
+      <div class="step-num">01</div>
+      <div class="step-title">Greedy Choice</div>
+      <div class="step-desc">Always fill the lowest tax slab first before moving to higher ones</div>
+    </div>
+    <div class="concept-step">
+      <div class="step-num">02</div>
+      <div class="step-title">Optimal Substructure</div>
+      <div class="step-desc">Tax on each slab is independent — optimal local = optimal global</div>
+    </div>
+    <div class="concept-step">
+      <div class="step-num">03</div>
+      <div class="step-title">No Backtracking</div>
+      <div class="step-desc">Once a slab is filled, we never revisit — greedy commits to each choice</div>
+    </div>
+  </div>
+
+  <!-- Main Calculator -->
+  <div class="greedy-grid">
+    <div class="card">
+      <div class="card-title">Input Parameters</div>
+      <div class="input-row">
+        <label>Annual CTC (₹)</label>
+        <input class="fancy-input" type="number" id="ctc-input" value="1200000" oninput="calcGreedy()">
+      </div>
+      <div class="input-row">
+        <label>HRA Exemption (₹)</label>
+        <input class="fancy-input" type="number" id="hra-input" value="120000" oninput="calcGreedy()">
+      </div>
+      <div class="input-row">
+        <label>80C Deduction (₹)</label>
+        <input class="fancy-input" type="number" id="deduct-input" value="150000" oninput="calcGreedy()">
+      </div>
+      <div class="input-row">
+        <label>Std. Deduction (₹)</label>
+        <input class="fancy-input" type="number" id="std-input" value="50000" oninput="calcGreedy()">
+      </div>
+      <div class="greedy-result" id="greedy-result"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Greedy Bracket Fill — New Tax Regime FY2024-25</div>
+      <table class="bracket-table">
+        <thead><tr><th>Slab Range</th><th>Rate</th><th>Amount Filled</th><th>Tax</th></tr></thead>
+        <tbody id="bracket-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Greedy Property Proof -->
+  <div class="proof-box">
+    <h4>Why Greedy Works for Tax Computation</h4>
+    <p><span class="highlight">Greedy Choice Property:</span> The tax system has independent slabs — the tax on ₹3L–₹7L does not depend on decisions made above ₹7L. Each greedy choice is safe.</p>
+    <p><span class="highlight">Optimal Substructure:</span> The optimal tax for income X = optimal tax for the first slab + optimal tax for remainder. This recursive property confirms greedy correctness.</p>
+    <p><span class="highlight">Proof by Exchange Argument:</span> Suppose we tried to pay a higher slab first. We'd end up paying more tax on the same income — contradicting optimality. Therefore greedy (lowest slab first) is always optimal.</p>
+  </div>
+
+  <script>
+    const slabs=[{min:0,max:300000,rate:0},{min:300001,max:700000,rate:5},{min:700001,max:1000000,rate:10},{min:1000001,max:1200000,rate:15},{min:1200001,max:1500000,rate:20},{min:1500001,max:Infinity,rate:30}];
+    function fmtINR(n){return '₹'+Math.abs(n).toLocaleString('en-IN');}
+    function calcGreedy(){
+      const ctc=+document.getElementById('ctc-input').value||0;
+      const hra=+document.getElementById('hra-input').value||0;
+      const ded=+document.getElementById('deduct-input').value||0;
+      const std=+document.getElementById('std-input').value||0;
+      const taxable=Math.max(0,ctc-hra-ded-std);
+      let tax=0,rows='';
+      slabs.forEach(s=>{
+        const inSlab=Math.max(0,Math.min(taxable,s.max)-(s.min-1));
+        const t=(inSlab*s.rate)/100;tax+=t;
+        const isActive=taxable>=s.min;
+        rows+=`<tr class="${isActive?'active-row':''}"><td>${fmtINR(s.min)} – ${s.max===Infinity?'Above':fmtINR(s.max)}</td><td class="tax-pct">${s.rate}%</td><td>${inSlab>0?fmtINR(inSlab):'—'}</td><td>${t>0?fmtINR(Math.round(t)):'—'}</td></tr>`;
+      });
+      document.getElementById('bracket-body').innerHTML=rows;
+      const cess=tax*.04,monthly=(ctc-tax-cess)/12;
+      document.getElementById('greedy-result').innerHTML=`<div class="result-row"><span class="result-key">Gross CTC</span><span class="result-val">${fmtINR(ctc)}</span></div><div class="result-row"><span class="result-key">Total Deductions</span><span class="result-val red">− ${fmtINR(hra+ded+std)}</span></div><div class="result-row"><span class="result-key">Taxable Income</span><span class="result-val gold">${fmtINR(taxable)}</span></div><div class="result-row"><span class="result-key">Income Tax</span><span class="result-val red">${fmtINR(Math.round(tax))}</span></div><div class="result-row"><span class="result-key">Cess (4%)</span><span class="result-val red">${fmtINR(Math.round(cess))}</span></div><div class="result-row" style="border-top:1px solid var(--border);padding-top:8px;margin-top:4px;"><span class="result-key">Monthly Take-Home</span><span class="result-val" style="font-size:.95rem">${fmtINR(Math.round(monthly))}</span></div>`;
+    }
+    calcGreedy();
+  </script>
+</body>
+</html>

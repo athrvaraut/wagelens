@@ -1,0 +1,182 @@
+<!-- ============================================
+     sections/hero.html
+     Hero Section — Standalone Reference
+     Note: This is included in index.html already.
+     Use this file as a component reference.
+============================================ -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hero Section — DAA Salary Engine</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Unbounded:wght@700;900&family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050810; --accent1: #00f5c4; --accent2: #ff6b35;
+      --accent3: #7c3fff; --accent4: #ffd23f;
+      --text: #e8eaf6; --text2: #7a8db5; --border: #1a2540;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Space Mono', monospace; }
+
+    #hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 80px 40px;
+      position: relative; overflow: hidden;
+    }
+
+    /* Animated grid background */
+    #hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(26,37,64,.6) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26,37,64,.6) 1px, transparent 1px);
+      background-size: 60px 60px;
+      z-index: 0;
+    }
+
+    .hero-content { position: relative; z-index: 1; }
+
+    .hero-tag {
+      display: inline-block;
+      font-size: .65rem; letter-spacing: .3em;
+      color: var(--accent1); text-transform: uppercase;
+      border: 1px solid rgba(0,245,196,.3);
+      padding: 6px 18px; border-radius: 2px;
+      margin-bottom: 36px;
+      animation: fadeUp .8s ease both;
+    }
+
+    .hero-title {
+      font-family: 'Unbounded', sans-serif;
+      font-size: clamp(3rem, 9vw, 8rem);
+      font-weight: 900; line-height: .95;
+      margin-bottom: 24px;
+      animation: fadeUp .8s .1s ease both;
+    }
+    .hero-title .t1 { color: var(--accent1); display: block; }
+    .hero-title .t2 { color: transparent; -webkit-text-stroke: 1px rgba(232,234,246,.3); display: block; }
+    .hero-title .t3 { color: var(--accent2); display: block; }
+
+    .hero-sub {
+      max-width: 580px; font-size: .85rem;
+      line-height: 1.8; color: var(--text2);
+      margin: 0 auto 50px;
+      animation: fadeUp .8s .2s ease both;
+    }
+
+    .hero-chips {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      justify-content: center;
+      animation: fadeUp .8s .3s ease both;
+    }
+    .chip {
+      font-size: .65rem; letter-spacing: .08em;
+      padding: 5px 14px; border-radius: 20px;
+      text-transform: uppercase; font-weight: 700;
+    }
+    .chip-teal   { background: rgba(0,245,196,.12); color: var(--accent1); border: 1px solid rgba(0,245,196,.3); }
+    .chip-orange { background: rgba(255,107,53,.12); color: var(--accent2); border: 1px solid rgba(255,107,53,.3); }
+    .chip-violet { background: rgba(124,63,255,.12); color: var(--accent3); border: 1px solid rgba(124,63,255,.3); }
+    .chip-gold   { background: rgba(255,210,63,.12); color: var(--accent4); border: 1px solid rgba(255,210,63,.3); }
+
+    .scroll-hint {
+      position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center;
+      gap: 8px; color: var(--text2); font-size: .6rem;
+      letter-spacing: .15em; text-transform: uppercase;
+      animation: bounce 2s infinite;
+    }
+    .scroll-arrow { width: 1px; height: 40px; background: linear-gradient(var(--accent1), transparent); }
+
+    /* Glowing orbs */
+    .orb {
+      position: absolute; border-radius: 50%;
+      filter: blur(80px); opacity: .15; z-index: 0;
+    }
+    .orb1 { width: 400px; height: 400px; background: var(--accent1); top: -100px; left: -100px; }
+    .orb2 { width: 300px; height: 300px; background: var(--accent3); bottom: -50px; right: -50px; }
+    .orb3 { width: 200px; height: 200px; background: var(--accent2); top: 50%; right: 20%; }
+
+    /* Stats row */
+    .hero-stats {
+      display: flex; gap: 40px; justify-content: center;
+      margin-top: 50px; flex-wrap: wrap;
+      animation: fadeUp .8s .4s ease both;
+    }
+    .stat-item { text-align: center; }
+    .stat-val {
+      font-family: 'Unbounded', sans-serif;
+      font-size: 1.8rem; font-weight: 900;
+      color: var(--accent1);
+    }
+    .stat-label { font-size: .6rem; color: var(--text2); letter-spacing: .1em; text-transform: uppercase; margin-top: 4px; }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(8px);} }
+  </style>
+</head>
+<body>
+  <section id="hero">
+    <!-- Glowing background orbs -->
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+
+    <div class="hero-content">
+      <div class="hero-tag">Design &amp; Analysis of Algorithms</div>
+
+      <h1 class="hero-title">
+        <span class="t1">SALARY</span>
+        <span class="t2">COMPUTATION</span>
+        <span class="t3">ENGINE</span>
+      </h1>
+
+      <p class="hero-sub">
+        Every paycheck is an algorithm in disguise. Explore how Sorting, Greedy methods,
+        Dynamic Programming, Divide &amp; Conquer, Graph Theory, Backtracking, Hashing,
+        and Binary Search power real-world salary systems.
+      </p>
+
+      <div class="hero-chips">
+        <span class="chip chip-teal">Sorting</span>
+        <span class="chip chip-orange">Greedy</span>
+        <span class="chip chip-violet">Dynamic Programming</span>
+        <span class="chip chip-gold">Divide &amp; Conquer</span>
+        <span class="chip chip-teal">Binary Search</span>
+        <span class="chip chip-orange">Graph Algorithms</span>
+        <span class="chip chip-violet">Backtracking</span>
+        <span class="chip chip-gold">Hashing</span>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-val">8+</div>
+          <div class="stat-label">Algorithms</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">10</div>
+          <div class="stat-label">Live Demos</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">O(1)</div>
+          <div class="stat-label">Best Lookup</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">₹</div>
+          <div class="stat-label">Salary Focus</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-hint">
+      <div class="scroll-arrow"></div>
+      scroll to explore
+    </div>
+  </section>
+</body>
+</html>
