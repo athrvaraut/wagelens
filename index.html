@@ -1648,9 +1648,9 @@ function renderDashboard() {
     { label:'Tax + Cess',    val:'−'+fmt(d.monthlyTax),cls:'deduction',sub:'Income tax' },
     { label:'Take-Home',     val: fmt(d.net),          cls:'earning',   sub:'Into your account' },
   ];
-  const stripActions = ['','openModal("gross-modal")','openModal("pf-modal")','openModal("tax-modal")',''];
+  const stripActions = ['','gross-modal','pf-modal','tax-modal',''];
   document.getElementById('salary-strip').innerHTML = stripItems.map((s,i)=>`
-    <div class="strip-item${stripActions[i]?' clickable':''}" ${stripActions[i]?`onclick="${stripActions[i]}"`:''} title="${stripActions[i]?'Click for details':''}">
+    <div class="strip-item${stripActions[i]?' clickable':''}" onclick="${stripActions[i]?`openModal('${stripActions[i]}')`:''}">
       <div class="si-label">${s.label}</div>
       <div class="si-val ${s.cls}">${s.val}</div>
       <div class="si-sub">${s.sub}${stripActions[i]?' <span style="color:var(--mint);font-size:.6rem">→ details</span>':''}</div>
@@ -1926,8 +1926,10 @@ function closeModal(id) {
 }
 
 // Close on overlay click
-document.querySelectorAll('.modal-overlay').forEach(ov => {
-  ov.addEventListener('click', e => { if (e.target === ov) closeModal(ov.id); });
+window.addEventListener('load', () => {
+  document.querySelectorAll('.modal-overlay').forEach(ov => {
+    ov.addEventListener('click', e => { if (e.target === ov) closeModal(ov.id); });
+  });
 });
 
 /* ═══════════════════════════════════════════════════
@@ -2130,6 +2132,19 @@ window.addEventListener('load', ()=>{
     if(el) updateRange(el, id+'-val', '%');
   });
 });
+
+// Fix modal strip clicks
+document.addEventListener('click', function(e) {
+  const strip = e.target.closest('.strip-item.clickable');
+  if (strip) {
+    const modals = {1:'gross-modal', 2:'pf-modal', 3:'tax-modal'};
+    const items = document.querySelectorAll('.strip-item');
+    items.forEach((item, i) => {
+      if (item === strip && modals[i]) openModal(modals[i]);
+    });
+  }
+});
+
 </script>
 
 <!-- ════════ PF MODAL ════════ -->
