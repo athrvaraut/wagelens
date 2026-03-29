@@ -1303,6 +1303,14 @@ function goTo(id) {
   document.getElementById('page-' + id).classList.add('active');
   window.scrollTo(0,0);
 
+  // Refresh sliders when going to input page
+  if (id === 'input') {
+    ['f-hra','f-da','f-pf'].forEach(elId => {
+      const el = document.getElementById(elId);
+      if (el) updateRange(el, elId + '-val', '%');
+    });
+  }
+
   // Nav state
   const inReport = ['dashboard','tax','growth'].includes(id);
   document.getElementById('page-nav').style.display = inReport ? 'flex' : 'none';
@@ -1461,10 +1469,10 @@ function calculate() {
   const industry = document.getElementById('f-industry').value;
   const exp      = document.getElementById('f-exp').value;
   const basic    = +document.getElementById('f-basic').value || 60000;
-  const hraPct   = +document.getElementById('f-hra').value || 40;
-  const daPct    = +document.getElementById('f-da').value || 10;
+  const hraPct   = +document.getElementById('f-hra').value;
+  const daPct    = +document.getElementById('f-da').value;
   const special  = +document.getElementById('f-special').value || 8000;
-  const pfPct    = +document.getElementById('f-pf').value || 12;
+  const pfPct    = +document.getElementById('f-pf').value;
   const inv80c   = +document.getElementById('f-80c').value || 150000;
   const pt       = +document.getElementById('f-pt').value || 200;
   const regime   = document.getElementById('f-regime').value;
