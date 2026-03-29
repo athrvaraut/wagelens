@@ -701,6 +701,115 @@ body {
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+
+/* ═══ MODAL SYSTEM ═══ */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(28,25,23,.55);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--cream); border-radius: var(--r-xl);
+  border: 1px solid var(--border);
+  width: 100%; max-width: 720px; max-height: 88vh;
+  overflow-y: auto;
+  transform: translateY(24px) scale(.97);
+  transition: transform .3s cubic-bezier(.22,.68,0,1.2);
+  box-shadow: 0 32px 80px rgba(28,25,23,.18);
+}
+.modal-overlay.open .modal { transform: translateY(0) scale(1); }
+.modal-top {
+  padding: 28px 32px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start; justify-content: space-between;
+  position: sticky; top: 0; background: var(--cream); z-index: 2;
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+}
+.modal-title { font-family: "Playfair Display",serif; font-size: 1.4rem; font-weight: 700; color: var(--forest); }
+.modal-sub { font-size: .78rem; color: var(--muted); margin-top: 4px; }
+.modal-close {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--parchment); border: 1px solid var(--border);
+  cursor: pointer; font-size: 1rem; color: var(--stone);
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s; flex-shrink: 0;
+}
+.modal-close:hover { background: var(--coral); color: white; border-color: var(--coral); }
+.modal-body { padding: 28px 32px 32px; }
+
+/* PF chart */
+.pf-summary-row {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 14px;
+  margin-bottom: 24px;
+}
+.pf-stat {
+  background: var(--parchment); border-radius: var(--r-md);
+  padding: 16px; text-align: center; border: 1px solid var(--border);
+}
+.pf-stat .ps-val { font-family:"Playfair Display",serif; font-size:1.5rem; font-weight:700; color:var(--forest); }
+.pf-stat .ps-label { font-size:.65rem; color:var(--muted); margin-top:3px; letter-spacing:.06em; text-transform:uppercase; }
+.pf-bar-chart { display:flex; align-items:flex-end; gap:8px; height:160px; margin:20px 0 8px; }
+.pf-bar-group { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.pf-bar-stack { width:100%; display:flex; flex-direction:column; justify-content:flex-end; }
+.pf-seg { width:100%; border-radius:4px 4px 0 0; transition:height .5s ease; }
+.pf-bar-yr { font-size:.62rem; color:var(--muted); text-align:center; }
+.pf-legend { display:flex; gap:16px; margin-top:8px; }
+.pf-leg-item { display:flex; align-items:center; gap:6px; font-size:.72rem; color:var(--stone); }
+.pf-leg-dot { width:10px; height:10px; border-radius:2px; }
+
+/* Tax breakdown modal */
+.tax-why-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:24px; }
+.tax-why-card {
+  background:var(--parchment); border:1px solid var(--border);
+  border-radius:var(--r-md); padding:18px;
+}
+.twc-icon { font-size:1.4rem; margin-bottom:8px; }
+.twc-title { font-size:.8rem; font-weight:600; color:var(--forest); margin-bottom:4px; }
+.twc-body { font-size:.72rem; color:var(--muted); line-height:1.6; }
+.tax-slab-visual { margin:20px 0; }
+.tsv-row {
+  display:flex; align-items:center; gap:12px;
+  margin-bottom:10px;
+}
+.tsv-label { font-size:.72rem; color:var(--stone); width:120px; flex-shrink:0; }
+.tsv-bar-wrap { flex:1; height:22px; background:var(--parchment); border-radius:4px; overflow:hidden; position:relative; }
+.tsv-bar-fill { height:100%; border-radius:4px; display:flex; align-items:center; padding-left:8px; }
+.tsv-bar-text { font-size:.62rem; font-weight:600; color:white; }
+.tsv-amount { font-family:"JetBrains Mono",monospace; font-size:.72rem; color:var(--stone); width:80px; text-align:right; flex-shrink:0; }
+.tsv-nil { color:var(--muted); font-size:.7rem; }
+
+/* Month timeline */
+.month-timeline { display:grid; grid-template-columns:repeat(12,1fr); gap:4px; margin:16px 0; }
+.mt-cell {
+  aspect-ratio:1; border-radius:4px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.55rem; font-weight:600;
+  transition:all .2s; cursor:default;
+}
+.mt-cell.tax-paid { background:rgba(231,111,81,.2); color:var(--coral); }
+.mt-cell.tax-free { background:rgba(82,183,136,.15); color:var(--green); }
+.mt-legend-row { display:flex; gap:16px; }
+
+/* Info highlight box */
+.info-box {
+  background:rgba(82,183,136,.08); border:1px solid rgba(82,183,136,.25);
+  border-radius:var(--r-md); padding:16px 20px;
+  display:flex; gap:12px; align-items:flex-start;
+  margin-bottom:20px;
+}
+.info-box .ib-icon { font-size:1.2rem; flex-shrink:0; }
+.info-box .ib-text { font-size:.78rem; color:var(--stone); line-height:1.7; }
+.info-box .ib-text strong { color:var(--forest); }
+
+/* Clickable strip items */
+.strip-item.clickable { cursor:pointer; }
+.strip-item.clickable:hover { background:var(--sage) !important; }
+
 /* Responsive */
 @media (max-width: 1024px) {
   .home-hero { grid-template-columns: 1fr; }
@@ -1034,24 +1143,18 @@ body {
       </div>
 
       <div class="form-divider"></div>
-
       <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">80C Investments (₹/year)</label>
-          <input class="form-input money" type="number" id="f-80c" placeholder="150000" value="150000">
-        </div>
         <div class="form-group">
           <label class="form-label">Professional Tax (₹/month)</label>
           <input class="form-input money" type="number" id="f-pt" placeholder="200" value="200">
         </div>
-        <div class="form-group full">
-          <label class="form-label">Tax Regime Preference</label>
-          <select class="form-select" id="f-regime">
-            <option value="new" selected>New Regime (Simpler, lower rates)</option>
-            <option value="old">Old Regime (More deductions)</option>
-          </select>
+        <div class="form-group">
+          <label class="form-label">Years at Current Company</label>
+          <input class="form-input money" type="number" id="f-years" placeholder="3" value="3" min="1" max="40">
         </div>
       </div>
+      <input type="hidden" id="f-regime" value="new">
+      <input type="hidden" id="f-80c" value="0">
 
       <button class="btn-calculate" onclick="calculate()">
         <span>🔍</span> Analyse My Salary
@@ -1190,8 +1293,9 @@ body {
 
     <!-- Action Buttons -->
     <div class="action-row">
-      <button class="btn-action primary" onclick="goTo('tax')">💹 Deep Tax Analysis</button>
-      <button class="btn-action primary" onclick="goTo('growth')">📈 Career Growth Plan</button>
+      <button class="btn-action primary" onclick="openModal('tax-modal')">💹 Tax Deep Dive</button>
+      <button class="btn-action primary" onclick="openModal('pf-modal')">🏦 PF Savings Chart</button>
+      <button class="btn-action primary" onclick="goTo('growth')">📈 Career Growth</button>
       <button class="btn-action secondary" onclick="goTo('input')">← Edit Details</button>
     </div>
 
@@ -1475,6 +1579,8 @@ function calculate() {
   const pfPct    = +document.getElementById('f-pf').value;
   const inv80c   = +document.getElementById('f-80c').value || 150000;
   const pt       = +document.getElementById('f-pt').value || 200;
+  // f-years is used in PF modal — stored in currentData
+  const yearsAtJob = +document.getElementById('f-years').value || 3;
   const regime   = document.getElementById('f-regime').value;
 
   // Compute components
@@ -1542,11 +1648,12 @@ function renderDashboard() {
     { label:'Tax + Cess',    val:'−'+fmt(d.monthlyTax),cls:'deduction',sub:'Income tax' },
     { label:'Take-Home',     val: fmt(d.net),          cls:'earning',   sub:'Into your account' },
   ];
-  document.getElementById('salary-strip').innerHTML = stripItems.map(s=>`
-    <div class="strip-item">
+  const stripActions = ['','openModal("gross-modal")','openModal("pf-modal")','openModal("tax-modal")',''];
+  document.getElementById('salary-strip').innerHTML = stripItems.map((s,i)=>`
+    <div class="strip-item${stripActions[i]?' clickable':''}" ${stripActions[i]?`onclick="${stripActions[i]}"`:''} title="${stripActions[i]?'Click for details':''}">
       <div class="si-label">${s.label}</div>
       <div class="si-val ${s.cls}">${s.val}</div>
-      <div class="si-sub">${s.sub}</div>
+      <div class="si-sub">${s.sub}${stripActions[i]?' <span style="color:var(--mint);font-size:.6rem">→ details</span>':''}</div>
     </div>`).join('');
 
   // Breakdown Bar
@@ -1799,6 +1906,211 @@ function drawGrowthChart(optimal, stay, labels) {
   labels.forEach((l,i)=>ctx.fillText(l,toX(i),H-6));
 }
 
+
+/* ═══════════════════════════════════════════════════
+   MODAL SYSTEM
+═══════════════════════════════════════════════════ */
+function openModal(id) {
+  const d = currentData;
+  if (!d) return;
+  if (id === 'pf-modal')    renderPFModal(d);
+  if (id === 'tax-modal')   renderTaxModal(d);
+  if (id === 'gross-modal') renderGrossModal(d);
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(ov => {
+  ov.addEventListener('click', e => { if (e.target === ov) closeModal(ov.id); });
+});
+
+/* ═══════════════════════════════════════════════════
+   PF MODAL — Year-by-year PF accumulation chart
+═══════════════════════════════════════════════════ */
+function renderPFModal(d) {
+  const pfRate   = 0.0815; // 8.15% p.a.
+  const yearsAt  = +document.getElementById('f-years').value || 3;
+  const totalYrs = Math.max(yearsAt, 10);
+  const monthlyPF= d.pf;           // employee share
+  const employerPF = monthlyPF;    // employer matches 12%
+  const annualEmp  = monthlyPF * 12;
+  const annualEmpr = employerPF * 12;
+
+  // Compute cumulative PF with compound interest
+  let corpus = 0;
+  const yearData = [];
+  for (let y = 1; y <= totalYrs; y++) {
+    const prevCorpus = corpus;
+    corpus = (corpus + annualEmp + annualEmpr) * (1 + pfRate);
+    const interest = corpus - prevCorpus - annualEmp - annualEmpr;
+    yearData.push({
+      year: y,
+      empCum: annualEmp * y,
+      emprCum: annualEmpr * y,
+      interest: corpus - annualEmp * y - annualEmpr * y,
+      total: corpus,
+      annualInterest: Math.max(0, interest)
+    });
+  }
+
+  const currentCorpus = yearData[yearsAt - 1];
+  const finalCorpus   = yearData[totalYrs - 1];
+
+  // Summary stats
+  document.getElementById('pf-summary-row').innerHTML = `
+    <div class="pf-stat">
+      <div class="ps-val">${fmt(monthlyPF * 2)}</div>
+      <div class="ps-label">Monthly Total (You + Employer)</div>
+    </div>
+    <div class="pf-stat">
+      <div class="ps-val">${fmt(currentCorpus.total)}</div>
+      <div class="ps-label">Current Corpus (${yearsAt} yr${yearsAt>1?'s':''})</div>
+    </div>
+    <div class="pf-stat">
+      <div class="ps-val">${fmt(finalCorpus.total)}</div>
+      <div class="ps-label">Projected at 10 Years</div>
+    </div>`;
+
+  // Bar chart
+  const maxTotal = finalCorpus.total;
+  const chartH   = 140;
+  const bars = yearData.slice(0, Math.min(totalYrs, 15)).map((y, i) => {
+    const empH   = Math.round((y.empCum / maxTotal) * chartH);
+    const emprH  = Math.round((y.emprCum / maxTotal) * chartH);
+    const intH   = Math.round((y.interest / maxTotal) * chartH);
+    const isCurrent = (i + 1) === yearsAt;
+    return `<div class="pf-bar-group">
+      <div class="pf-bar-stack" style="height:${chartH}px;justify-content:flex-end;">
+        <div style="background:#B7E4C7;height:${intH}px;border-radius:3px 3px 0 0;"></div>
+        <div style="background:#52B788;height:${emprH}px;"></div>
+        <div style="background:#2D6A4F;height:${empH}px;"></div>
+      </div>
+      <div class="pf-bar-yr" style="color:${isCurrent?'var(--coral)':'var(--muted)'};font-weight:${isCurrent?700:400}">Y${y.year}${isCurrent?' ◀':''}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('pf-bar-chart').innerHTML = bars;
+
+  // Table
+  document.getElementById('pf-table').innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:.75rem;">
+      <thead><tr style="background:var(--parchment);">
+        <th style="padding:10px 14px;text-align:left;color:var(--muted);font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;">Year</th>
+        <th style="padding:10px 14px;text-align:right;color:var(--muted);font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;">Your Total</th>
+        <th style="padding:10px 14px;text-align:right;color:var(--muted);font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;">Employer Total</th>
+        <th style="padding:10px 14px;text-align:right;color:var(--muted);font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;">Interest Earned</th>
+        <th style="padding:10px 14px;text-align:right;color:var(--muted);font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;">Total Corpus</th>
+      </tr></thead>
+      <tbody>
+        ${yearData.map((y,i)=>`
+        <tr style="border-bottom:1px solid var(--border);background:${(i+1)===yearsAt?'rgba(82,183,136,.06)':'white'}">
+          <td style="padding:10px 14px;font-family:'JetBrains Mono',monospace;color:${(i+1)===yearsAt?'var(--forest)':'var(--stone)'};font-weight:${(i+1)===yearsAt?700:400}">Year ${y.year}${(i+1)===yearsAt?' ← Now':''}</td>
+          <td style="padding:10px 14px;text-align:right;font-family:'JetBrains Mono',monospace;color:var(--forest)">${fmt(y.empCum)}</td>
+          <td style="padding:10px 14px;text-align:right;font-family:'JetBrains Mono',monospace;color:var(--green)">${fmt(y.emprCum)}</td>
+          <td style="padding:10px 14px;text-align:right;font-family:'JetBrains Mono',monospace;color:var(--mint)">${fmt(y.interest)}</td>
+          <td style="padding:10px 14px;text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--forest)">${fmt(y.total)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+/* ═══════════════════════════════════════════════════
+   TAX MODAL — Full explanation with visuals
+═══════════════════════════════════════════════════ */
+function renderTaxModal(d) {
+  const slabs = d.taxResult.slabs;
+  const colors = ['#E7E2D9','#B7E4C7','#52B788','#2D6A4F','#1B4332','#0D2B1E'];
+  const maxFilled = Math.max(...slabs.map(s=>s.filled||0), 1);
+
+  // Slab visual
+  document.getElementById('tax-slab-visual').innerHTML = slabs.map((s,i) => {
+    const pct = Math.round((s.filled / maxFilled) * 100);
+    return `<div class="tsv-row">
+      <div class="tsv-label" style="font-size:.68rem">${s.range}</div>
+      <div class="tsv-bar-wrap">
+        ${s.filled > 0
+          ? `<div class="tsv-bar-fill" style="width:${pct}%;background:${colors[i]||'#2D6A4F'}">
+              <span class="tsv-bar-text">${s.rate}%</span>
+             </div>`
+          : `<span class="tsv-nil" style="padding-left:8px;line-height:22px;">Not reached</span>`}
+      </div>
+      <div class="tsv-amount">${s.tax > 0 ? fmt(s.tax) : '₹0'}</div>
+    </div>`;
+  }).join('');
+
+  // Month timeline
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('month-timeline').innerHTML = months.map((m,i) => `
+    <div class="mt-cell ${d.monthlyTax > 0 ? 'tax-paid' : 'tax-free'}" title="${m}: −${fmt(d.monthlyTax)} TDS">
+      ${m.slice(0,1)}
+    </div>`).join('');
+
+  // Summary
+  const effectiveRate = ((d.taxResult.totalTax / d.annualGross)*100).toFixed(1);
+  document.getElementById('tax-modal-summary').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+      <div class="pf-stat">
+        <div class="ps-val">${fmt(d.monthlyTax)}</div>
+        <div class="ps-label">Monthly TDS Cut</div>
+      </div>
+      <div class="pf-stat">
+        <div class="ps-val">${fmt(d.taxResult.totalTax)}</div>
+        <div class="ps-label">Annual Tax + Cess</div>
+      </div>
+      <div class="pf-stat">
+        <div class="ps-val">${effectiveRate}%</div>
+        <div class="ps-label">Effective Tax Rate</div>
+      </div>
+    </div>
+    <div class="info-box" style="margin-top:16px;">
+      <span class="ib-icon">✅</span>
+      <div class="ib-text">
+        You are on the <strong>New Tax Regime</strong> — no manual deductions needed. Your employer automatically deducts ₹${Math.round(d.monthlyTax).toLocaleString('en-IN')} every month as TDS and deposits it with the government. You can verify this in <strong>Form 26AS</strong> on the Income Tax portal.
+      </div>
+    </div>`;
+}
+
+/* ═══════════════════════════════════════════════════
+   GROSS MODAL — Component breakdown
+═══════════════════════════════════════════════════ */
+function renderGrossModal(d) {
+  const components = [
+    { name:'Basic Salary', val:d.basic, pct:Math.round(d.basic/d.gross*100), color:'#2D6A4F', why:'The foundation of your salary. PF, HRA, DA are all calculated as a % of basic.' },
+    { name:'HRA', val:d.hra, pct:Math.round(d.hra/d.gross*100), color:'#52B788', why:'House Rent Allowance. Helps cover rental costs. Partially/fully exempt from tax if you pay rent.' },
+    { name:'DA', val:d.da, pct:Math.round(d.da/d.gross*100), color:'#74C69D', why:'Dearness Allowance. Compensates for inflation/cost of living. Fully taxable.' },
+    { name:'Special Allowance', val:d.special, pct:Math.round(d.special/d.gross*100), color:'#B7E4C7', why:'Flexible component that makes up the rest. Fully taxable but no PF deduction on it.' },
+  ];
+
+  document.getElementById('gross-modal-body').innerHTML = `
+    <div class="info-box">
+      <span class="ib-icon">📋</span>
+      <div class="ib-text">Your <strong>Gross Salary of ${fmt(d.gross)}/month</strong> is made of ${components.length} components. Understanding each helps you negotiate better and plan taxes smartly.</div>
+    </div>
+    ${components.map(c => `
+    <div style="background:var(--parchment);border:1px solid var(--border);border-radius:var(--r-md);padding:18px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-weight:600;color:var(--forest);font-size:.88rem;">${c.name}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--forest)">${fmt(c.val)}<span style="font-size:.68rem;color:var(--muted);font-family:'DM Sans',sans-serif">/month</span></div>
+      </div>
+      <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:10px;">
+        <div style="height:100%;width:${c.pct}%;background:${c.color};border-radius:4px;transition:width .6s ease;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-size:.72rem;color:var(--muted);">${c.pct}% of gross salary</div>
+        <div style="font-size:.68rem;color:var(--stone);max-width:300px;text-align:right;">${c.why}</div>
+      </div>
+    </div>`).join('')}
+    <div style="background:var(--forest);border-radius:var(--r-md);padding:18px;display:flex;justify-content:space-between;align-items:center;">
+      <div style="color:rgba(255,255,255,.7);font-size:.8rem;font-weight:600;">TOTAL GROSS SALARY</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:white;">${fmt(d.gross)}<span style="font-size:.8rem;color:rgba(255,255,255,.6);font-family:'DM Sans',sans-serif">/month</span></div>
+    </div>`;
+}
+
 /* ═══════════════════════════════════════════════════
    TOAST
 ═══════════════════════════════════════════════════ */
@@ -1819,5 +2131,101 @@ window.addEventListener('load', ()=>{
   });
 });
 </script>
+
+<!-- ════════ PF MODAL ════════ -->
+<div class="modal-overlay" id="pf-modal">
+  <div class="modal">
+    <div class="modal-top">
+      <div>
+        <div class="modal-title">Your PF Savings Journey</div>
+        <div class="modal-sub">Provident Fund accumulation over your career — with interest</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('pf-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="info-box">
+        <span class="ib-icon">💡</span>
+        <div class="ib-text">
+          <strong>What is PF?</strong> Every month, 12% of your Basic Salary is deducted as your PF contribution. Your employer also adds another 12%. The total earns <strong>8.15% interest per year</strong> (tax-free!) — compounding to a large corpus at retirement.
+        </div>
+      </div>
+      <div class="pf-summary-row" id="pf-summary-row"></div>
+      <div style="font-size:.78rem;font-weight:600;color:var(--forest);margin-bottom:12px;">Year-by-Year PF Growth (Your Share + Employer Share + Interest)</div>
+      <div class="pf-bar-chart" id="pf-bar-chart"></div>
+      <div class="pf-legend">
+        <div class="pf-leg-item"><div class="pf-leg-dot" style="background:#2D6A4F"></div>Your contribution</div>
+        <div class="pf-leg-item"><div class="pf-leg-dot" style="background:#52B788"></div>Employer match</div>
+        <div class="pf-leg-item"><div class="pf-leg-dot" style="background:#B7E4C7"></div>Interest earned</div>
+      </div>
+      <div id="pf-table" style="margin-top:24px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ TAX MODAL ════════ -->
+<div class="modal-overlay" id="tax-modal">
+  <div class="modal">
+    <div class="modal-top">
+      <div>
+        <div class="modal-title">Your Tax — Explained Completely</div>
+        <div class="modal-sub">When, why, how much, and where your tax goes</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('tax-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="tax-why-grid">
+        <div class="tax-why-card">
+          <div class="twc-icon">📅</div>
+          <div class="twc-title">WHEN is tax deducted?</div>
+          <div class="twc-body">Every month when your salary is processed — your employer deducts TDS (Tax Deducted at Source) before crediting your account. You never handle it — it's automatic.</div>
+        </div>
+        <div class="tax-why-card">
+          <div class="twc-icon">🏛️</div>
+          <div class="twc-title">WHY do you pay tax?</div>
+          <div class="twc-body">Tax funds public infrastructure — roads, hospitals, defence, schools. India uses a progressive slab system: higher income = higher rate. It's your contribution to the nation.</div>
+        </div>
+        <div class="tax-why-card">
+          <div class="twc-icon">🔢</div>
+          <div class="twc-title">HOW is it calculated?</div>
+          <div class="twc-body">Not on your full salary — only on "taxable income". Gross salary minus Standard Deduction (₹50,000) = taxable income. Then each slab rate applies only to income within that slab.</div>
+        </div>
+        <div class="tax-why-card">
+          <div class="twc-icon">💰</div>
+          <div class="twc-title">WHERE does it go?</div>
+          <div class="twc-body">Central Government (80%) + State Government (20%). Used for MGNREGA, PM-KISAN, infrastructure, defence, education, healthcare subsidies and public services.</div>
+        </div>
+      </div>
+
+      <div style="font-size:.82rem;font-weight:600;color:var(--forest);margin-bottom:16px;">How Your Salary Flows Through Tax Slabs</div>
+      <div class="tax-slab-visual" id="tax-slab-visual"></div>
+
+      <div style="font-size:.82rem;font-weight:600;color:var(--forest);margin:20px 0 12px;">Which Months Feel the Tax Impact?</div>
+      <div class="month-timeline" id="month-timeline"></div>
+      <div class="mt-legend-row">
+        <div class="pf-leg-item"><div class="pf-leg-dot" style="background:rgba(231,111,81,.3)"></div>Tax deducted month</div>
+        <div class="pf-leg-item"><div class="pf-leg-dot" style="background:rgba(82,183,136,.2)"></div>No extra tax</div>
+      </div>
+
+      <div id="tax-modal-summary" style="margin-top:24px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ GROSS MODAL ════════ -->
+<div class="modal-overlay" id="gross-modal">
+  <div class="modal">
+    <div class="modal-top">
+      <div>
+        <div class="modal-title">Your Gross Salary Breakdown</div>
+        <div class="modal-sub">Every component that builds your total compensation</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('gross-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="gross-modal-body"></div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
