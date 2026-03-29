@@ -90,7 +90,7 @@ Double-click index.html
 1. Create GitHub repo named: DAA-SalaryEngine
 2. Push all files
 3. Settings → Pages → Branch: main → /root
-4. Live at: https://yourusername.github.io/DAA-SalaryEngine/
+4. Live at: athrvaraut.github.io/wagelens
 ```
 
 ---
