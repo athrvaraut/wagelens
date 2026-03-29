@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # DAA × SALARY ENGINE
 ### Design & Analysis of Algorithms — Applied to Salary Computation
 
@@ -104,3 +105,6 @@ Double-click index.html
 ---
 
 *Built for DAA Subject Project — Algorithm Visualization on Salary Calculation*
+=======
+# wagelens
+>>>>>>> f19992c6c409d8d79e2b37a2797e345391e7ead0
